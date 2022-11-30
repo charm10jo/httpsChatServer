@@ -270,34 +270,34 @@
 
             signupForm.addEventListener("submit", (event) => {
                 event.preventDefault();
-                const nick = signupForm.querySelector('#sign_nick').value
+                const Id = signupForm.querySelector('#sign_nick').value
                 const password = signupForm.querySelector('#sign_password').value
                 const confirm = signupForm.querySelector('#sign_confirmPassword').value
                 const gender = signupForm.querySelector(`input[name="gender"]:checked`).value || null
                 const livingAt = signupForm.querySelector('#living').value || null
                 const birthday = signupForm.querySelector('#birth').value || null
-                let korIns = 0
+                let korIns = false
                 if(signupForm.querySelector('input[name="KI"]:checked')){
-                    korIns = 1 
+                    korIns = true
                 }
-                let privIns = 0
+                let privIns = false
                 if(signupForm.querySelector('input[name="PI"]:checked')){
-                    privIns = 1 
+                    privIns = true
                 } 
-                const phone = signupForm.querySelector('#Phone').value || null
-                const userName = signupForm.querySelector('#userName').value || null
+                const phoneNumber = signupForm.querySelector('#Phone').value || null
+                const name = signupForm.querySelector('#userName').value || null
                 
                 const data = {
-                    Id: nick,
+                    Id,
                     password,
                     confirm,
-                    gender,
+                    gender: Number(gender),
                     // livingAt,
                     birthday,
                     korIns,
                     privIns,
-                    phoneNumber: phone,
-                    name: userName,
+                    phoneNumber,
+                    name
                 }
 
                 socket.emit("signup", data);
