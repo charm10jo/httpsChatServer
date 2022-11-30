@@ -118,7 +118,7 @@
 	<script>	
 	    
 	    // const socket = io('wss://charm10jo-chat.shop:3333/chat')
-        const socket = io('ws://13.124.87.77/:3333/chat')
+        const socket = io('ws://13.124.87.77:3333/chat')
 
             
 	    const welcome = document.getElementById("welcome");
@@ -284,9 +284,9 @@
                 if(signupForm.querySelector('input[name="PI"]:checked')){
                     privIns = true
                 } 
-                const phoneNumber = signupForm.querySelector('#Phone').value || null
+                const phoneNumber = Number(signupForm.querySelector('#Phone').value) || null
                 const name = signupForm.querySelector('#userName').value || null
-                
+                 
                 const data = {
                     Id,
                     password,
