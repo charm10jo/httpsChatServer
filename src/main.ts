@@ -12,15 +12,15 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { all } from 'axios';
 
-const httpsOptions = { // 최준영: 환경변수로~
-  ca: fs.readFileSync('/etc/letsencrypt/live/charm10jo-chat.shop/fullchain.pem'),
-  key: fs.readFileSync('/etc/letsencrypt/live/charm10jo-chat.shop/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/charm10jo-chat.shop/cert.pem')
-}
+// const httpsOptions = { // 최준영: 환경변수로~
+//   ca: fs.readFileSync('/etc/letsencrypt/live/charm10jo-chat.shop/fullchain.pem'),
+//   key: fs.readFileSync('/etc/letsencrypt/live/charm10jo-chat.shop/privkey.pem'),
+//   cert: fs.readFileSync('/etc/letsencrypt/live/charm10jo-chat.shop/cert.pem')
+// }
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {httpsOptions});
-  // const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // const app = await NestFactory.create<NestExpressApplication>(AppModule, {httpsOptions});
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // await app.init();
 
   app.enableCors({
