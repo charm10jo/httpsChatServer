@@ -212,7 +212,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() datum: {nickname:string, password:string}
     ) {
-        const response = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop:3000/login", datum))
+        const response = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/login", datum))
         const token = response.data['token'];
         return { success: true, token };
     }
@@ -222,7 +222,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() data: signupDto,
     ) {
-        const a = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop:3000/signup", JSON.stringify(data)));
+        console.log(data)
+        const a = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/signup", data));
+        console.log(a)
     }
 
     @SubscribeMessage('open_signup')

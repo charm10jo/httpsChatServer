@@ -288,16 +288,16 @@
                 const userName = signupForm.querySelector('#userName').value || null
                 
                 const data = {
-                    nick,
+                    Id: nick,
                     password,
                     confirm,
                     gender,
-                    livingAt,
+                    // livingAt,
                     birthday,
                     korIns,
                     privIns,
-                    phone,
-                    userName,
+                    phoneNumber: phone,
+                    name: userName,
                 }
 
                 socket.emit("signup", data);
