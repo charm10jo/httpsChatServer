@@ -223,7 +223,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() data: signupDto,
     ) {
         const a = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop:3000/signup", JSON.stringify(data)));
-        console.log(a)
     }
 
     @SubscribeMessage('open_signup')

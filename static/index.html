@@ -273,21 +273,24 @@
                 const nick = signupForm.querySelector('#sign_nick').value
                 const password = signupForm.querySelector('#sign_password').value
                 const confirm = signupForm.querySelector('#sign_confirmPassword').value
-                const gender = signupForm.querySelector(`input[name="gender"]:checked`).value
-                const livingAt = signupForm.querySelector('#living').value
-                const birthday = signupForm.querySelector('#birth').value
+                const gender = signupForm.querySelector(`input[name="gender"]:checked`).value || null
+                const livingAt = signupForm.querySelector('#living').value || null
+                const birthday = signupForm.querySelector('#birth').value || null
                 let korIns = 0
                 if(signupForm.querySelector('input[name="KI"]:checked')){
-                    korIns = 1
+                    korIns = 1 
                 }
                 let privIns = 0
                 if(signupForm.querySelector('input[name="PI"]:checked')){
-                    privIns = 1
-                }
-                const phone = signupForm.querySelector('#Phone').value
-                const userName = signupForm.querySelector('#userName').value
-
-                const optional = {
+                    privIns = 1 
+                } 
+                const phone = signupForm.querySelector('#Phone').value || null
+                const userName = signupForm.querySelector('#userName').value || null
+                
+                const data = {
+                    nick,
+                    password,
+                    confirm,
                     gender,
                     livingAt,
                     birthday,
@@ -295,12 +298,10 @@
                     privIns,
                     phone,
                     userName,
-                };
+                }
 
-                socket.emit("signup", nick, password, confirm, optional, () => {
-                    signup.hidden = true;
-                    login.hidden = false;
-                });
+                socket.emit("signup", data);
+                
             });
 
             socket.on("welcome", (lang) => {
