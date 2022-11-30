@@ -5,6 +5,8 @@ import { firstValueFrom } from 'rxjs';
 import signupDto from './dto/signup.dto'
 import BotMessageDto from "./dto/botMessage.dto";
 import { LoginUserDto } from "./dto/loginuser.dto";
+// import { translate } from "../utility/papago"
+import axios from 'axios';
 
 let createdRooms: string[] = [];
 
@@ -147,12 +149,31 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             region,
             language
         } = botMessageDto;
-        
+
         let { num_division, num_address, num_language }= drl_StrToNum(division, region, language, nmm); // by number
         num_division = 0;
         const res = await firstValueFrom(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
-        let response = res.data
-        socket.emit('botMessage', {response});
+        
+        // 프론트로 데이터 10개만 넘겨주기
+        const hospitalInfo = res.data.slice(0,9);
+
+        // 번역 api
+        // let translated_obj = "";
+        // console.log(symptoms)
+        // let options = {
+        //     headers: {
+        //         'X-Naver-Client-Id':'oAQCssrtaASt74fsofNc',
+        //         'X-Naver-Client-Secret': 'o0gPzgUmhP',
+        //         "Content-Type": "application/json; charset=UTF-8",
+        //     },
+            
+        // };
+        // const axiosData = {'source': language, 'target':'ko', 'text':symptoms}
+        
+        // let result = await axios.post('https://openapi.naver.com/v1/papago/n2mt',axiosData,options)
+        
+        socket.emit('botMessage', hospitalInfo,'번역기 고장났으..');
+        
     };
 
     @SubscribeMessage('message')

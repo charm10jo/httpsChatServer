@@ -126,7 +126,7 @@
         const signupForm = signup.querySelector("form");
 
         let roomName;
-
+        let mapId =0;
         function addMessage(message) {
             const ul = room.querySelector("ul");
             const li = document.createElement("li");
@@ -348,11 +348,10 @@
             }
         });
         
-        socket.on("botMessage", (response) => {
-            // console.log(res, trdText, mapId)
+        socket.on("botMessage", (res,trdText) => {
             
             let addressArray = [{x:latitude, y:longitude, hospitalName:'내위치'}]
-            response.forEach(e => {
+            res.forEach(e => {
                 coordinate(e.address,(data)=>{
                 if(addressArray.length < 5){
                     addressArray.push({x: Number(data[0].y) , y:Number(data[0].x), hospitalName:e.hospitalName, hospitalAddr:e.address})
@@ -367,6 +366,7 @@
                 const result = drawMap(addressArray, mapId, trdText);
                 console.log(res.find(res => res.address === result[1].hospitalAddr))
                 response_bot(res.find(res => res.address === result[1].hospitalAddr), trdText);
+                mapId++;
             }, 150);
         });
 		</script>
