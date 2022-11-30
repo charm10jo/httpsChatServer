@@ -25,7 +25,7 @@
         </header>
 
         <main>
-            <div id="loginPage", style="display:none">
+            <div id="loginPage">
                 <h2>Login Page</h2>
                 <h3>If you don't need to signup, click "Just Keep Going" Button plz.</h3>
                 <form id="loginForm_login">
@@ -43,7 +43,7 @@
                 </form>
             </div>
 
-            <div id="signupPage">
+            <div id="signupPage" , style="display:none">
                 <h2>SignUp</h2>
                 <form>
                     <label>nickname <input id="sign_nick", required, type="text", name="sign_user"></label>
@@ -116,232 +116,259 @@
         </main>
 	<script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script><script></script>
 	<script>	
-	    
-	    // const socket = io('wss://charm10jo-chat.shop:3333/chat')
-        const socket = io('ws://13.124.87.77:3333/chat')
+        // const socket = io('ws://13.124.87.77:3333/chat')
+        const socket = io('http://localhost:3333/chat');
 
-            
 	    const welcome = document.getElementById("welcome");
-            
-            const form = welcome.querySelector("form");
+        const form = welcome.querySelector("form");
+        const room = document.getElementById("room");
+        const signup = document.getElementById("signupPage");
+        const signupForm = signup.querySelector("form");
 
-            const room = document.getElementById("room");
-            const signup = document.getElementById("signupPage");
-            const signupForm = signup.querySelector("form");
+        let roomName;
 
-            let roomName;
+        function addMessage(message) {
+            const ul = room.querySelector("ul");
+            const li = document.createElement("li");
+            li.innerText = message;
+            ul.appendChild(li);
+        }
 
-            function addMessage(message) {
-                const ul = room.querySelector("ul");
-                const li = document.createElement("li");
-                li.innerText = message;
-                ul.appendChild(li);
-            }
+        function createMapDiv(mapId){
+            // <div id="map" style="width:100%;height:350px;"></div>
+            const ul = room.querySelector("ul");
+            const div = document.createElement("div");
+            div.id = `map${mapId}`;
+            div.style = "width:60%;height:350px;";
+            ul.appendChild(div);
+        }
 
-            function createMapDiv(mapId){
-                // <div id="map" style="width:100%;height:350px;"></div>
-                const ul = room.querySelector("ul");
-                const div = document.createElement("div");
-                div.id = `map${mapId}`;
-                div.style = "width:60%;height:350px;";
-                ul.appendChild(div);
-            }
+        function addButton(myAddr, hospitalAddr){
+            const ul = room.querySelector("ul");
+            const a = document.createElement("a");
+            a.href = `https://map.kakao.com/?sName=${myAddr}&eName=${hospitalAddr}`;
+            a.innerText = '<추천 의료시설 경로 안내 바로가기>'; 
+            a.setAttribute('target','_blank');
+            ul.appendChild(a);
+        }
 
-            function addButton(myAddr, hospitalAddr){
-                const ul = room.querySelector("ul");
-                const a = document.createElement("a");
-                a.href = `https://map.kakao.com/?sName=${myAddr}&eName=${hospitalAddr}`;
-                a.innerText = '<추천 의료시설 경로 안내 바로가기>'; 
-                a.setAttribute('target','_blank');
-                ul.appendChild(a);
-            }
-
-            function foreignLang(str) {
-                const chars = [...str];
-                let langs = [];
-                chars.map((v, i) => {
-                    if(v == 1 && i == 0){
-                    langs.push("English");
-                    }else if(v == 1 && i == 1){
-                    langs.push("Chinese");
-                    }else if(v == 1 && i == 2){
-                    langs.push("Vietnamese");
-                    }else if(v == 1 && i == 3){
-                    langs.push("Mongolian");
-                    }else if(v == 1 && i == 4){
-                    langs.push("Thai");
-                    }else if(v == 1 && i == 5){
-                    langs.push("Russian");
-                    }else if(v == 1 && i == 6){
-                    langs.push("Kazaht");
-                    }else if(v == 1 && i == 7){
-                    langs.push("Japanese");
-                    }
-                })
-                if(langs.length == 0){
-                    return "Only Korean"
+        function foreignLang(str) {
+            const chars = [...str];
+            let langs = [];
+            chars.map((v, i) => {
+                if(v == 1 && i == 0){
+                langs.push("English");
+                }else if(v == 1 && i == 1){
+                langs.push("Chinese");
+                }else if(v == 1 && i == 2){
+                langs.push("Vietnamese");
+                }else if(v == 1 && i == 3){
+                langs.push("Mongolian");
+                }else if(v == 1 && i == 4){
+                langs.push("Thai");
+                }else if(v == 1 && i == 5){
+                langs.push("Russian");
+                }else if(v == 1 && i == 6){
+                langs.push("Kazaht");
+                }else if(v == 1 && i == 7){
+                langs.push("Japanese");
                 }
-                return langs
-            }
-
-            // bot 응답 메세지 
-            function response_bot(data, trdText){
-                const forr = foreignLang(data.foreignLanguages);
-
-                addMessage(`Bot 
-                    번역 : ${trdText}
-                    병원 이름 : ${data.hospitalName}
-                    병원 주소 : ${data.address}
-                    진료 가능 언어: ${forr}
-                    진료 일정 
-                    mon: ${data.mon},
-                    tue: ${data.tue},
-                    wed: ${data.wed},
-                    thu: ${data.thu},
-                    fri: ${data.fri},
-                    sat: ${data.sat},
-                    sun: ${data.sun},
-                `);
-                
-                addButton(myaddress, data.address);
-            }
-
-            function handleMessageSubmit(event) {
-                event.preventDefault();
-                // const input = room.querySelector("#msg input");
-                const d = room.querySelector(`#msg input[name="division"]`);
-                const s = room.querySelector(`#msg textarea[name="Symptoms"]`)
-                const nmm = room.querySelector(`#msg input[name="NMM"]:checked`);
-                const priority = room.querySelector(`#msg input[name="EL"]:checked`);
-
-                socket.emit("new_message", d.value, s.value, nmm.value, priority.value, myregion, () => {
-                    addMessage(`You: ${s.value}`);
-                });
-            }
-
-            function showRoom() {
-                welcome.hidden = true;
-                room.hidden = false;
-                const h3 = room.querySelector("h3");
-                h3.innerText = `Room ${roomName}`;
-                const msgForm = room.querySelector("#msg");
-                msgForm.addEventListener("submit", handleMessageSubmit);
-            }
-
-            function handleRoomSubmit(event) {
-                event.preventDefault();
-                const langVal = form.querySelector(`input[name="langs"]:checked`).value;
-                const lang = form.querySelector(`input[name="langs"]:checked`).parentElement.innerText;
-                socket.emit("enter_room", lang, langVal, showRoom);
-                roomName = lang;
-            }
-
-            form.addEventListener("submit", handleRoomSubmit);
-
-            loginForm_login.addEventListener("submit", (event) => {
-                event.preventDefault();
-                const nick = loginForm_login.querySelector('#nick').value;
-                const password = loginForm_login.querySelector('#password').value;
-
-                socket.emit("login", nick, password, () => {
-                        login.hidden = true;
-                        welcome.hidden = false;
-                        const header = document.getElementById("header");
-                        const h1 = header.querySelector("h1")
-                        h1.innerText = `Welcome ${nick}!`;
-                    });
-            });
-
-            loginForm_signup.addEventListener("submit", (event) => {
-                event.preventDefault();
-                socket.emit("open_signup", () => {
-                    login.hidden = true;
-                    signup.hidden = false;
-                });
-            });
-
-            loginForm_JKG.addEventListener("submit", (event) => {
-                event.preventDefault();
-                socket.emit("open_welcome", () => {
-                    login.hidden = true;
-                    welcome.hidden = false;
-                });
-            });
-
-            signupForm.addEventListener("submit", (event) => {
-                event.preventDefault();
-                const Id = signupForm.querySelector('#sign_nick').value
-                const password = signupForm.querySelector('#sign_password').value
-                const confirm = signupForm.querySelector('#sign_confirmPassword').value
-                const gender = signupForm.querySelector(`input[name="gender"]:checked`).value || null
-                const livingAt = signupForm.querySelector('#living').value || null
-                const birthday = signupForm.querySelector('#birth').value || null
-                let korIns = false
-                if(signupForm.querySelector('input[name="KI"]:checked')){
-                    korIns = true
-                }
-                let privIns = false
-                if(signupForm.querySelector('input[name="PI"]:checked')){
-                    privIns = true
-                } 
-                const phoneNumber = Number(signupForm.querySelector('#Phone').value) || null
-                const name = signupForm.querySelector('#userName').value || null
-                 
-                const data = {
-                    Id,
-                    password,
-                    confirm,
-                    gender: Number(gender),
-                    // livingAt,
-                    birthday,
-                    korIns,
-                    privIns,
-                    phoneNumber,
-                    name
-                }
-
-                socket.emit("signup", data);
-                
-            });
-
-            socket.on("welcome", (lang) => {
-                const h3 = room.querySelector("h3");
-                h3.innerText = `Room ${lang}`;
-                // addMessage(`${user} arrived!`);
-            });
-
-            socket.on("bye", () => {
-                const h3 = room.querySelector("h3");
-                h3.innerText = `Room ${roomName}`;
-                // addMessage(`${left} left.`);
-            });
-
-            // socket.on("new_message", addMessage);
-            socket.on("botMessage", (res, trdText, mapId) => {
-                let addressArray = [{x:latitude, y:longitude, hospitalName:'내위치'}]
-                res.forEach(e => {
-                    coordinate(e.address,(data)=>{
-                    if(addressArray.length < 5){
-                        addressArray.push({x: Number(data[0].y) , y:Number(data[0].x), hospitalName:e.hospitalName, hospitalAddr:e.address})
-                    }else{
-                        return true
-                    } })
-                });
-            
-            // createMap(latitude, longitude, 1);
-            setTimeout(() => {
-                    createMapDiv(mapId);
-                    const result = drawMap(addressArray, mapId, trdText);
-                    console.log(res.find(res => res.address === result[1].hospitalAddr))
-                    response_bot(res.find(res => res.address === result[1].hospitalAddr), trdText);
-                }, 150);
-            });
-
-            socket.on("receivedToken", token => {
-                window.sessionStorage.setItem("token", token);
             })
+            if(langs.length == 0){
+                return "Only Korean"
+            }
+            return langs
+        }
 
-            socket.on("new_message", addMessage);
+        // bot 응답 메세지 
+        function response_bot(data, trdText){
+            const forr = foreignLang(data.foreignLanguages);
+
+            addMessage(`Bot 
+                번역 : ${trdText}
+                병원 이름 : ${data.hospitalName}
+                병원 주소 : ${data.address}
+                진료 가능 언어: ${forr}
+                진료 일정 
+                mon: ${data.mon},
+                tue: ${data.tue},
+                wed: ${data.wed},
+                thu: ${data.thu},
+                fri: ${data.fri},
+                sat: ${data.sat},
+                sun: ${data.sun},
+            `);
+            
+            addButton(myaddress, data.address);
+        }
+
+        function handleMessageSubmit(event) {
+            event.preventDefault();
+            // const input = room.querySelector("#msg input");
+            const d = room.querySelector(`#msg input[name="division"]`).value;
+            const s = room.querySelector(`#msg textarea[name="Symptoms"]`).value;
+            const nmm = room.querySelector(`#msg input[name="NMM"]:checked`).value;
+            const priority = room.querySelector(`#msg input[name="EL"]:checked`).value;
+            const language = socket['lang'];
+            const region ="강남구"
+            
+            const data = {
+                division: d,
+                symptoms: s,
+                nmm,
+                priority,
+                region,
+                language
+            };
+
+            // socket.emit("botMessage", d, s, nmm, priority, region, () => {
+            //     addMessage(`You: ${s.value}`);
+            // });
+
+            socket.emit("botMessage", data);
+        }
+
+        function showRoom(roomName, langVal) {
+            document.getElementById("welcome").style.display = 'none';
+            document.getElementById("room").style.display = 'block';
+            const h3 = room.querySelector("h3");
+            h3.innerText = `Room ${roomName}`;
+            const msgForm = room.querySelector("#msg");
+            msgForm.addEventListener("submit", handleMessageSubmit);
+        }
+
+        function handleRoomSubmit(event) {
+            event.preventDefault();
+            const langVal = form.querySelector(`input[name="langs"]:checked`).value;
+            const lang = form.querySelector(`input[name="langs"]:checked`).parentElement.innerText;
+            roomName = lang;
+            socket['lang'] = langVal;
+            showRoom(roomName);
+            
+        }
+
+        form.addEventListener("submit", handleRoomSubmit);
+
+        loginForm_login.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const Id = loginForm_login.querySelector('#nick').value;
+            const password = loginForm_login.querySelector('#password').value;
+            const loginUserDto = {
+                Id, 
+                password
+            } 
+            
+            socket.emit("login", loginUserDto);
+        })
+
+        loginForm_signup.addEventListener("submit", (event) => {
+            event.preventDefault();
+            document.getElementById("loginPage").style.display = 'none';
+            document.getElementById("signupPage").style.display = 'block';
+        });
+
+        loginForm_JKG.addEventListener("submit", (event) => {
+            event.preventDefault();
+            document.getElementById("loginPage").style.display = 'none';
+            document.getElementById("welcome").style.display = 'block';
+        });
+
+        signupForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const Id = signupForm.querySelector('#sign_nick').value
+            const password = signupForm.querySelector('#sign_password').value
+            const confirm = signupForm.querySelector('#sign_confirmPassword').value
+            const gender = signupForm.querySelector(`input[name="gender"]:checked`).value || null
+            const livingAt = signupForm.querySelector('#living').value || null
+            const birthday = signupForm.querySelector('#birth').value || null
+            let korIns = false
+            if(signupForm.querySelector('input[name="KI"]:checked')){
+                korIns = true
+            }
+            let privIns = false
+            if(signupForm.querySelector('input[name="PI"]:checked')){
+                privIns = true
+            } 
+            const phoneNumber = Number(signupForm.querySelector('#Phone').value) || null
+            const name = signupForm.querySelector('#userName').value || null
+                
+            const data = {
+                Id,
+                password,
+                confirm,
+                gender: Number(gender),
+                // livingAt,
+                birthday,
+                korIns,
+                privIns,
+                phoneNumber,
+                name
+            };
+
+            socket.emit('signup', data);
+        });
+
+        socket.on("welcome", (lang) => {
+            const h3 = room.querySelector("h3");
+            h3.innerText = `Room ${lang}`;
+            // addMessage(`${user} arrived!`);
+        });
+
+        socket.on("bye", () => {
+            const h3 = room.querySelector("h3");
+            h3.innerText = `Room ${roomName}`;
+            // addMessage(`${left} left.`);
+        });
+
+        socket.on("login", (res) => {
+            const { success, token } = res;
+
+            if(success){
+                window.sessionStorage.setItem("token", token);
+
+                document.getElementById("loginPage").style.display = 'none';
+                document.getElementById("welcome").style.display = 'block';
+
+                const header = document.getElementById("header");
+                const h1 = header.querySelector("h1")
+
+                h1.innerText = `Welcome ${res.nick}!`;
+
+            } else {
+                throw new Error("Login failed: get false message")
+            }
+        });
+
+        socket.on("signup", (success) => {
+            if(!success){
+                throw new Error("Signup failed")
+            } else {
+                document.getElementById("signupPage").style.display = 'none';
+                document.getElementById("loginPage").style.display = 'block';
+            }
+        });
+        
+        socket.on("botMessage", (response) => {
+            // console.log(res, trdText, mapId)
+            
+            let addressArray = [{x:latitude, y:longitude, hospitalName:'내위치'}]
+            response.forEach(e => {
+                coordinate(e.address,(data)=>{
+                if(addressArray.length < 5){
+                    addressArray.push({x: Number(data[0].y) , y:Number(data[0].x), hospitalName:e.hospitalName, hospitalAddr:e.address})
+                }else{
+                    return true
+                } })
+            });
+        
+        // createMap(latitude, longitude, 1);
+        setTimeout(() => {
+                createMapDiv(mapId);
+                const result = drawMap(addressArray, mapId, trdText);
+                console.log(res.find(res => res.address === result[1].hospitalAddr))
+                response_bot(res.find(res => res.address === result[1].hospitalAddr), trdText);
+            }, 150);
+        });
 		</script>
     </body>
 </html>

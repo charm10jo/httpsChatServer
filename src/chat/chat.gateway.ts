@@ -4,6 +4,7 @@ import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from 'rxjs';
 import signupDto from './dto/signup.dto'
 import BotMessageDto from "./dto/botMessage.dto";
+import { LoginUserDto } from "./dto/loginuser.dto";
 
 let createdRooms: string[] = [];
 
@@ -147,11 +148,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             language
         } = botMessageDto;
         
-        const { num_division, num_address, num_language }= drl_StrToNum(division, region, language, nmm); // by number
-
-        const response = await firstValueFrom(this.httpService.get("")); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
-        socket.emit('botMessage', { username: socket.id, response});
-        // return { username: socket.id, message };
+        let { num_division, num_address, num_language }= drl_StrToNum(division, region, language, nmm); // by number
+        num_division = 0;
+        const res = await firstValueFrom(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
+        let response = res.data
+        socket.emit('botMessage', {response});
     };
 
     @SubscribeMessage('message')
@@ -160,7 +161,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() {roomName, message}: any, // type 수정 필요
     ) {
         socket.broadcast.to(roomName).emit('message', { username: socket.id, message });
-        return { username: socket.id, message };
     };
 
     @SubscribeMessage('room-list')
@@ -175,7 +175,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     ) {
         const exists = createdRooms.find((createdRoom) => createdRoom === roomName);
         if (exists) {
-        return { success: false, payload: `${roomName} 방이 이미 존재합니다.` };
+            return { success: false, payload: `${roomName} 방이 이미 존재합니다.` };
         }
 
         socket.join(roomName); // 기존에 없던 room으로 join하면 room이 생성됨
@@ -210,11 +210,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('login')
     async handleLogin(
         @ConnectedSocket() socket: Socket,
-        @MessageBody() datum: {nickname:string, password:string}
+        @MessageBody() loginUserDto: LoginUserDto
     ) {
-        const response = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/login", datum))
-        const token = response.data['token'];
-        return { success: true, token };
+        const response = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/login", loginUserDto))
+        const token = response.data['accessToken'];
+        const res = {
+            success: true,
+            token,
+            nick: loginUserDto.Id
+        };
+
+        socket.emit("login", res)
     }
 
     @SubscribeMessage('signup')
@@ -222,25 +228,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() data: signupDto,
     ) {
-        console.log(data)
-        const a = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/signup", data));
-        console.log(a)
+        await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/signup", data));
+        socket.emit('signup', {success: true})
     }
-
-    @SubscribeMessage('open_signup')
-    handleOpenSignup(
-        @ConnectedSocket() socket: Socket,
-        @MessageBody() done: Function,
-    ) {
-        done();
-    }
-
-    @SubscribeMessage('open_welcome')
-    handleOpenWelcome(
-        @ConnectedSocket() socket: Socket,
-        @MessageBody() done: Function,
-    ) {
-        done();
-    }
-
 }

@@ -13,7 +13,6 @@ $(document).ready(() => {
 });
 
 function getAddr(lat,lng){
-    let data;
     let geocoder = new kakao.maps.services.Geocoder();
 
     let coord = new kakao.maps.LatLng(lat, lng);
