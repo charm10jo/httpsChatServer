@@ -101,7 +101,7 @@ let ChatGateway = class ChatGateway {
         const divisions = Object.freeze({
             "내과": 0,
             "외과": 1,
-            "비뇨기과": 2,
+            "비뇨의학과": 2,
             "산부인과": 3,
             "성형외과": 4,
             "소아과": 5,
@@ -124,6 +124,7 @@ let ChatGateway = class ChatGateway {
             from: language,
             to: 'ko',
         });
+        console.log(translation);
         let { num_address, num_language } = await drl_StrToNum(region, language);
         let num_division;
         if (nmm === 1) {
@@ -140,6 +141,7 @@ let ChatGateway = class ChatGateway {
         }
         const res = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`));
         const hospitalInfo = res.data.slice(0, 9);
+        console.log(hospitalInfo[0].hospitalName);
         socket.emit('botMessage', hospitalInfo, translation);
     }
     ;

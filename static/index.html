@@ -99,8 +99,8 @@
                 <h3></h3>
                 <ul></ul>
                 <form id="msg">
-                    <!-- <textarea placeholder="Symptoms", required, name="Symptoms"></textarea> -->
-                    <input required, type="text", name="division", placeholder="divisions">
+                    <textarea placeholder="Symptoms", required, name="Symptoms"></textarea>
+                    <!-- <input required, type="text", name="division", placeholder="divisions"> -->
                     <h3>Necessary Medical Measures</h3>
                     <div>
                         <label for="NMM1">just some medicines <input id="NMM1", required, type="radio", name="NMM", value="1"></label>
@@ -207,7 +207,7 @@
         function handleMessageSubmit(event) {
             event.preventDefault();
             // const input = room.querySelector("#msg input");
-            const d = room.querySelector(`#msg input[name="division"]`).value;
+            // const d = room.querySelector(`#msg input[name="division"]`).value;
             const s = room.querySelector(`#msg textarea[name="Symptoms"]`).value;
             const nmm = room.querySelector(`#msg input[name="NMM"]:checked`).value;
             const priority = room.querySelector(`#msg input[name="EL"]:checked`).value;
@@ -215,7 +215,7 @@
             const region ="강남구"
             
             const data = {
-                division: d,
+                // division: d,
                 symptoms: s,
                 nmm,
                 priority,
