@@ -156,3 +156,4 @@ function displayCircleDot(position, distance, map, hospitalName,hospitalAddr) {
         distanceOverlay.setMap(map);
     }
 }
+

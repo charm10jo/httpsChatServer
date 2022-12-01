@@ -5,8 +5,8 @@ import { firstValueFrom } from 'rxjs';
 import signupDto from './dto/signup.dto'
 import BotMessageDto from "./dto/botMessage.dto";
 import { LoginUserDto } from "./dto/loginuser.dto";
-// import { translate } from "../utility/papago"
-import axios from 'axios';
+import { v2 } from '@google-cloud/translate';
+import { ConfigService } from '@nestjs/config';
 
 let createdRooms: string[] = [];
 
@@ -64,11 +64,11 @@ function drl_StrToNum(divisionByStrType: string, regionByStrType:string, languag
         "zh-CN": 2,   // 중국어 간체
         "zh-TW": 3,   // 중국어 번체
         "vi": 4,      // 베트남어
-        // "-": 4,       // 몽골어
-        "th": 5,      // 태국어
-        "ru": 6,      // 러시아어
-        // "-": 7,       // 카자흐어
-        "ja": 8,      // 일본어
+        "mn": 5,       // 몽골어
+        "th": 6,      // 태국어
+        "ru": 7,      // 러시아어
+        "kk": 8,       // 카자흐어
+        "ja": 9,      // 일본어
     });
 
     let num_division: number;
@@ -94,7 +94,8 @@ function drl_StrToNum(divisionByStrType: string, regionByStrType:string, languag
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
     constructor(
-        private readonly httpService : HttpService
+        private readonly httpService : HttpService,
+        private readonly configService : ConfigService
     ) {}
     
     @WebSocketServer() nsp: Namespace
@@ -156,23 +157,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         
         // 프론트로 데이터 10개만 넘겨주기
         const hospitalInfo = res.data.slice(0,9);
-
+        
         // 번역 api
-        // let translated_obj = "";
-        // console.log(symptoms)
-        // let options = {
-        //     headers: {
-        //         'X-Naver-Client-Id':'oAQCssrtaASt74fsofNc',
-        //         'X-Naver-Client-Secret': 'o0gPzgUmhP',
-        //         "Content-Type": "application/json; charset=UTF-8",
-        //     },
-            
-        // };
-        // const axiosData = {'source': language, 'target':'ko', 'text':symptoms}
+        const translateClient = new v2.Translate({
+            key : this.configService.get<string>('Translate_KEY')
+        });
+      
+        const [translation] = await translateClient.translate(symptoms, {
+            from: language,
+            to: 'ko',
+        });
         
-        // let result = await axios.post('https://openapi.naver.com/v1/papago/n2mt',axiosData,options)
-        
-        socket.emit('botMessage', hospitalInfo,'번역기 고장났으..');
+        socket.emit('botMessage', hospitalInfo,translation);
         
     };
 
