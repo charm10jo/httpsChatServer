@@ -23,26 +23,7 @@ const loginuser_dto_1 = require("./dto/loginuser.dto");
 const translate_1 = require("@google-cloud/translate");
 const config_1 = require("@nestjs/config");
 let createdRooms = [];
-function drl_StrToNum(divisionByStrType, regionByStrType, language, nmm) {
-    const divisions = Object.freeze({
-        "내과": 0,
-        "외과": 1,
-        "비뇨기과": 2,
-        "산부인과": 3,
-        "성형외과": 4,
-        "소아과": 5,
-        "신경과": 6,
-        "안과": 7,
-        "이비인후과": 8,
-        "재활의학과": 9,
-        "정신건강의학과": 10,
-        "정형외과": 11,
-        "치과": 12,
-        "피부과": 13,
-        '약국': 14,
-        "한방과": 15,
-        "응급실": 16
-    });
+async function drl_StrToNum(regionByStrType, language) {
     const addressArray = Object.freeze({
         "강남구": 0,
         "강동구": 1,
@@ -81,19 +62,9 @@ function drl_StrToNum(divisionByStrType, regionByStrType, language, nmm) {
         "kk": 8,
         "ja": 9,
     });
-    let num_division;
-    if (nmm === 1) {
-        num_division = 14;
-    }
-    else if (nmm == 3) {
-        num_division = 16;
-    }
-    else {
-        num_division = divisions[divisionByStrType];
-    }
     const num_address = addressArray[regionByStrType];
     const num_language = languageArray[language];
-    return { num_division, num_address, num_language };
+    return { num_address, num_language };
 }
 let ChatGateway = class ChatGateway {
     constructor(httpService, configService) {
@@ -126,11 +97,26 @@ let ChatGateway = class ChatGateway {
         console.log(`${socket.id} 소켓 연결 해제 ❌`);
     }
     async handlebotMessage(socket, botMessageDto) {
-        const { division, symptoms, nmm, priority, region, language } = botMessageDto;
-        let { num_division, num_address, num_language } = drl_StrToNum(division, region, language, nmm);
-        num_division = 0;
-        const res = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`));
-        const hospitalInfo = res.data.slice(0, 9);
+        const { symptoms, nmm, priority, region, language } = botMessageDto;
+        const divisions = Object.freeze({
+            "내과": 0,
+            "외과": 1,
+            "비뇨기과": 2,
+            "산부인과": 3,
+            "성형외과": 4,
+            "소아과": 5,
+            "신경과": 6,
+            "안과": 7,
+            "이비인후과": 8,
+            "재활의학과": 9,
+            "정신건강의학과": 10,
+            "정형외과": 11,
+            "치과": 12,
+            "피부과": 13,
+            '약국': 14,
+            "한방과": 15,
+            "응급실": 16
+        });
         const translateClient = new translate_1.v2.Translate({
             key: this.configService.get('Translate_KEY')
         });
@@ -138,6 +124,22 @@ let ChatGateway = class ChatGateway {
             from: language,
             to: 'ko',
         });
+        let { num_address, num_language } = await drl_StrToNum(region, language);
+        let num_division;
+        if (nmm === 1) {
+            num_division = 14;
+        }
+        else if (nmm == 3) {
+            num_division = 16;
+        }
+        else {
+            const my_division = await (0, rxjs_1.firstValueFrom)(this.httpService.post("http://54.242.143.192:5000/predict", {
+                symptoms: translation
+            }));
+            num_division = divisions[my_division['data']];
+        }
+        const res = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`));
+        const hospitalInfo = res.data.slice(0, 9);
         socket.emit('botMessage', hospitalInfo, translation);
     }
     ;

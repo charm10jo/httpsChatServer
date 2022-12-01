@@ -1,5 +1,4 @@
 export declare class BotMessageDto {
-    division: string;
     symptoms: string;
     nmm: number;
     priority: number;

@@ -1,9 +1,9 @@
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class BotMessageDto {
-    @IsNumber()
-    @IsNotEmpty()
-    division: string;
+    // @IsNumber()
+    // @IsNotEmpty()
+    // division: string;
 
     @IsString()
     @IsNotEmpty()

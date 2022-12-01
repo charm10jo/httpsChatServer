@@ -14,11 +14,6 @@ const class_validator_1 = require("class-validator");
 class BotMessageDto {
 }
 __decorate([
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], BotMessageDto.prototype, "division", void 0);
-__decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)

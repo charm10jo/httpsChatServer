@@ -10,27 +10,7 @@ import { ConfigService } from '@nestjs/config';
 
 let createdRooms: string[] = [];
 
-function drl_StrToNum(divisionByStrType: string, regionByStrType:string, language:string, nmm:number) {
-    const divisions = Object.freeze({
-        "내과": 0,
-        "외과": 1,
-        "비뇨기과": 2,
-        "산부인과": 3,
-        "성형외과": 4,
-        "소아과": 5,
-        "신경과": 6,
-        "안과": 7,
-        "이비인후과": 8,
-        "재활의학과": 9,
-        "정신건강의학과": 10,
-        "정형외과": 11,
-        "치과": 12,
-        "피부과": 13,
-        '약국': 14,
-        "한방과": 15,
-        "응급실": 16
-      });
-    
+async function drl_StrToNum(regionByStrType:string, language:string){
       const addressArray = Object.freeze({
         "강남구": 0,
         "강동구": 1,
@@ -71,19 +51,10 @@ function drl_StrToNum(divisionByStrType: string, regionByStrType:string, languag
         "ja": 9,      // 일본어
     });
 
-    let num_division: number;
-    
-    if(nmm === 1){
-        num_division = 14
-    } else if (nmm == 3) {
-        num_division = 16
-    } else {
-        num_division = divisions[divisionByStrType]
-    }
-
     const num_address: number = addressArray[regionByStrType]
     const num_language: number = languageArray[language]
-    return { num_division, num_address, num_language }
+
+    return { num_address, num_language }
 }
 
 @WebSocketGateway({
@@ -143,7 +114,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @MessageBody() botMessageDto : BotMessageDto // type 수정 필요
     ) {
         const {
-            division,
             symptoms,
             nmm,
             priority,
@@ -151,13 +121,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             language
         } = botMessageDto;
 
-        let { num_division, num_address, num_language }= drl_StrToNum(division, region, language, nmm); // by number
-        num_division = 0;
-        const res = await firstValueFrom(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
-        
-        // 프론트로 데이터 10개만 넘겨주기
-        const hospitalInfo = res.data.slice(0,9);
-        
+        const divisions = Object.freeze({
+            "내과": 0,
+            "외과": 1,
+            "비뇨기과": 2,
+            "산부인과": 3,
+            "성형외과": 4,
+            "소아과": 5,
+            "신경과": 6,
+            "안과": 7,
+            "이비인후과": 8,
+            "재활의학과": 9,
+            "정신건강의학과": 10,
+            "정형외과": 11,
+            "치과": 12,
+            "피부과": 13,
+            '약국': 14,
+            "한방과": 15,
+            "응급실": 16
+          });
+
         // 번역 api
         const translateClient = new v2.Translate({
             key : this.configService.get<string>('Translate_KEY')
@@ -167,9 +150,28 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             from: language,
             to: 'ko',
         });
+
+        let { num_address, num_language } = await drl_StrToNum(region, language); // by number
+
+        let num_division: number;
+    
+        if(nmm === 1){
+            num_division = 14
+        } else if (nmm == 3) {
+            num_division = 16
+        } else{
+            const my_division:Object = await firstValueFrom(this.httpService.post("http://54.242.143.192:5000/predict", {
+                symptoms: translation
+            }));
+            num_division = divisions[my_division['data']]
+        }
         
-        socket.emit('botMessage', hospitalInfo,translation);
+        const res = await firstValueFrom(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
         
+        // 프론트로 데이터 10개만 넘겨주기
+        const hospitalInfo = res.data.slice(0,9);
+        
+        socket.emit('botMessage', hospitalInfo, translation);
     };
 
     @SubscribeMessage('message')
