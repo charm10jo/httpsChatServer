@@ -137,11 +137,13 @@ let ChatGateway = class ChatGateway {
             const my_division = await (0, rxjs_1.firstValueFrom)(this.httpService.post("http://54.242.143.192:5000/predict", {
                 symptoms: translation
             }));
+            console.log(my_division['data']);
             num_division = divisions[my_division['data']];
         }
+        console.log(num_division);
         const res = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`));
         const hospitalInfo = res.data.slice(0, 9);
-        console.log(hospitalInfo[0].hospitalName);
+        console.log(hospitalInfo);
         socket.emit('botMessage', hospitalInfo, translation);
     }
     ;
