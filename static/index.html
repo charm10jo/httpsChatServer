@@ -2,6 +2,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>charm10jo</title>
         <link rel="stylesheet", href="https://unpkg.com/mvp.css">
@@ -118,7 +119,7 @@
         </main>
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script><script></script>
     <script>    
-        const socket = io('ws://charm10jo-diehard.shop:3333/chat')
+        const socket = io('ws://15.165.205.13/chat', {transports: ["websocket"]})
         //const socket = io('http://localhost:3333/chat');
 
         const welcome = document.getElementById("welcome");
