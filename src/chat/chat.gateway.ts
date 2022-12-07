@@ -168,7 +168,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }     
         console.log(num_division)
         
-        const res = await firstValueFrom(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
+        const res = await firstValueFrom(this.httpService.get(`https://charm10jo-skywalker.shop/${num_division}/${num_language}/${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
         
         const hospitalInfo = res.data.slice(0,9);
         console.log(hospitalInfo)
@@ -232,7 +232,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() loginUserDto: LoginUserDto
     ) {
-        const response = await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/login", loginUserDto))
+        const response = await firstValueFrom(this.httpService.post("https://charm10jo-skywalker.shop/login", loginUserDto))
         const token = response.data['accessToken'];
         const res = {
             success: true,
@@ -248,7 +248,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() data: signupDto,
     ) {
-        await firstValueFrom(this.httpService.post("http://charm10jo-skywalker.shop/signup", data));
+        await firstValueFrom(this.httpService.post("https://charm10jo-skywalker.shop/signup", data));
         socket.emit('signup', {success: true})
     }
 }
