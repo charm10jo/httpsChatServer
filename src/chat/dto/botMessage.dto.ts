@@ -24,6 +24,15 @@ export class BotMessageDto {
     @IsString()
     @IsNotEmpty()
     language: string;
+    
+    @IsNumber()
+    @IsNotEmpty()
+    latitude : number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    longitude : number;
+                 
 }
 
 export default BotMessageDto

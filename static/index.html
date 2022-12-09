@@ -32,7 +32,7 @@
                 <form id="loginForm_login">
                     <label>nickname <input id="nick", required, type="text", name="login_user"></label>
                     <label>password <input id="password", required, type="password", name="login_user"></label>
-                    <button>Login</button>
+                    <button id="loginBtn">Login</button>
                 </form>
 
                 <form id="loginForm_signup">
@@ -40,7 +40,7 @@
                 </form>
 
                 <form id="loginForm_JKG">
-                    <button>Just Keep Going</button>
+                    <button id="JKGBtn">Just Keep Going</button>
                 </form>
             </div>
 
@@ -120,7 +120,7 @@
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script><script></script>
     <script>    
         const socket = io('ws://15.165.205.13/chat', {transports: ["websocket"]})
-        //const socket = io('http://localhost:3333/chat');
+        // const socket = io('http://localhost:3333/chat');
 
         const welcome = document.getElementById("welcome");
         const form = welcome.querySelector("form");
@@ -156,27 +156,23 @@
         }
 
         function foreignLang(str) {
-            const chars = [...str];
             let langs = [];
-            chars.map((v, i) => {
-                if(v == 1 && i == 0){
-                langs.push("English");
-                }else if(v == 1 && i == 1){
-                langs.push("Chinese");
-                }else if(v == 1 && i == 2){
-                langs.push("Vietnamese");
-                }else if(v == 1 && i == 3){
-                langs.push("Mongolian");
-                }else if(v == 1 && i == 4){
-                langs.push("Thai");
-                }else if(v == 1 && i == 5){
-                langs.push("Russian");
-                }else if(v == 1 && i == 6){
-                langs.push("Kazaht");
-                }else if(v == 1 && i == 7){
-                langs.push("Japanese");
-                }
-            })
+            const test ={
+                English:str.language1English,
+                ChineseCN:str.language2ChineseCN,
+                ChineseTW:str.language3ChineseTW,
+                Vietnamese:str.language4Vietnamese,
+                Mongolian:str.language5Mongolian,
+                Thai:str.language6Thai,
+                Russian:str.language7Russian,
+                Kazakh:str.language8Kazakh,
+                Japanese:str.language9Japanese
+            } 
+            
+            for(let e in test){
+                if(test[e] === 1) langs.push(e);
+            }
+            
             if(langs.length == 0){
                 return "Only Korean"
             }
@@ -185,21 +181,16 @@
 
         // bot 응답 메세지 
         function response_bot(data, trdText){
-            const forr = foreignLang(data.foreignLanguages);
 
-            addMessage(`Bot 
+
+            const forr = foreignLang(data);
+
+            console.log(forr)
+            addMessage(`Bot >
                 번역 : ${trdText}
                 병원 이름 : ${data.hospitalName}
                 병원 주소 : ${data.address}
                 진료 가능 언어: ${forr}
-                진료 일정 
-                mon: ${data.mon},
-                tue: ${data.tue},
-                wed: ${data.wed},
-                thu: ${data.thu},
-                fri: ${data.fri},
-                sat: ${data.sat},
-                sun: ${data.sun},
             `);
             
             addButton(myaddress, data.address);
@@ -213,6 +204,8 @@
             const nmm = room.querySelector(`#msg input[name="NMM"]:checked`).value;
             const priority = room.querySelector(`#msg input[name="EL"]:checked`).value;
             const language = socket['lang'];
+            
+            // 지역구 정보는 이제 안받는 걸로 알고있는데 ?
             const region ="강남구"
             
             const data = {
@@ -221,9 +214,11 @@
                 nmm,
                 priority,
                 region,
-                language
+                language,
+                latitude,
+                longitude 
             };
-
+                    
             // socket.emit("botMessage", d, s, nmm, priority, region, () => {
             //     addMessage(`You: ${s.value}`);
             // });
@@ -352,24 +347,22 @@
         });
         
         socket.on("botMessage", (res,trdText) => {
-            
             let addressArray = [{x:latitude, y:longitude, hospitalName:'내위치'}]
+            
             res.forEach(e => {
                 coordinate(e.address,(data)=>{
-                if(addressArray.length < 5){
-                    addressArray.push({x: Number(data[0].y) , y:Number(data[0].x), hospitalName:e.hospitalName, hospitalAddr:e.address})
+                if(addressArray.length < 6){
+                    addressArray.push({x: Number(data[0].y) , y:Number(data[0].x), ... e})
                 }else{
                     return true
                 } })
             });
         
-        // createMap(latitude, longitude, 1);
         setTimeout(() => {
                 createMapDiv(mapId);
-                const result = drawMap(addressArray, mapId, trdText);
-                console.log(res.find(res => res.address === result[1].hospitalAddr))
-                response_bot(res.find(res => res.address === result[1].hospitalAddr), trdText);
-                mapId++;
+                drawMap(addressArray, mapId, trdText);
+                response_bot(addressArray[1], trdText);
+                mapId ++;
             }, 150);
         });
         </script>

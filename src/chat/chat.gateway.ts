@@ -118,9 +118,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             nmm,
             priority,
             region,
-            language
+            language,
+            latitude,
+            longitude 
         } = botMessageDto;
-
+        
         const divisions = Object.freeze({
             "내과": 0,
             "외과": 1,
@@ -154,7 +156,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let { num_address, num_language } = await drl_StrToNum(region, language); // by number
 
         let num_division: number;
-    
+
         if(nmm === 1){
             num_division = 14
         } else if (nmm == 3) {
@@ -165,14 +167,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             }));
             console.log(my_division['data'])
             num_division = divisions[my_division['data']]
-        }     
-        console.log(num_division)
-        
-        const res = await firstValueFrom(this.httpService.get(`https://charm10jo-skywalker.shop/${num_division}/${num_language}/${priority}`)); // 수정: WS 주소 입력, div, addr, lang, priority(query) 순서.
-        
-        const hospitalInfo = res.data.slice(0,9);
-        console.log(hospitalInfo)
-        socket.emit('botMessage', hospitalInfo, translation);
+        }             
+
+        const hospitalInfo = await firstValueFrom(this.httpService.post(`https://charm10jo-skywalker.shop`,{
+            "priority":priority,
+            "division":num_division,
+            "language":num_language,
+            "latitude":latitude,
+            "longitude":longitude
+        })); // post 요청으로 web 서버 통신
+          
+        socket.emit('botMessage', hospitalInfo.data.result, translation);
     };
 
     @SubscribeMessage('message')

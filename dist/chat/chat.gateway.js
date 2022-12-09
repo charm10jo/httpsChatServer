@@ -97,7 +97,7 @@ let ChatGateway = class ChatGateway {
         console.log(`${socket.id} 소켓 연결 해제 ❌`);
     }
     async handlebotMessage(socket, botMessageDto) {
-        const { symptoms, nmm, priority, region, language } = botMessageDto;
+        const { symptoms, nmm, priority, region, language, latitude, longitude } = botMessageDto;
         const divisions = Object.freeze({
             "내과": 0,
             "외과": 1,
@@ -140,11 +140,14 @@ let ChatGateway = class ChatGateway {
             console.log(my_division['data']);
             num_division = divisions[my_division['data']];
         }
-        console.log(num_division);
-        const res = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`http://charm10jo-skywalker.shop:3000/${num_division}/${num_address}/${num_language}?priority=${priority}`));
-        const hospitalInfo = res.data.slice(0, 9);
-        console.log(hospitalInfo);
-        socket.emit('botMessage', hospitalInfo, translation);
+        const hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`https://charm10jo-skywalker.shop`, {
+            "priority": priority,
+            "division": num_division,
+            "language": num_language,
+            "latitude": latitude,
+            "longitude": longitude
+        }));
+        socket.emit('botMessage', hospitalInfo.data.result, translation);
     }
     ;
     handleMessage(socket, { roomName, message }) {
@@ -177,7 +180,7 @@ let ChatGateway = class ChatGateway {
         return { success: true };
     }
     async handleLogin(socket, loginUserDto) {
-        const response = await (0, rxjs_1.firstValueFrom)(this.httpService.post("http://charm10jo-skywalker.shop/login", loginUserDto));
+        const response = await (0, rxjs_1.firstValueFrom)(this.httpService.post("https://charm10jo-skywalker.shop/login", loginUserDto));
         const token = response.data['accessToken'];
         const res = {
             success: true,
@@ -187,7 +190,7 @@ let ChatGateway = class ChatGateway {
         socket.emit("login", res);
     }
     async handleSignUp(socket, data) {
-        await (0, rxjs_1.firstValueFrom)(this.httpService.post("http://charm10jo-skywalker.shop/signup", data));
+        await (0, rxjs_1.firstValueFrom)(this.httpService.post("https://charm10jo-skywalker.shop/signup", data));
         socket.emit('signup', { success: true });
     }
 };

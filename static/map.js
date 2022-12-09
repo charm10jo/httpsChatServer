@@ -8,8 +8,6 @@ $(document).ready(() => {
         showYourLocation,
         showErrorMsg,
     );
-
-    
 });
 
 function getAddr(lat,lng){
@@ -21,7 +19,7 @@ function getAddr(lat,lng){
         if (status === kakao.maps.services.Status.OK) {
             
             myaddress = result[0].address.address_name;
-            myregion = result[0].address.region_2depth_name;
+            // myregion = result[0].address.region_2depth_name;
             console.log('주소 업데이트 완료 !');
         }
     });
@@ -32,8 +30,7 @@ function getAddr(lat,lng){
 function coordinate(address,callBack){
     let geocoder = new kakao.maps.services.Geocoder();
     geocoder.addressSearch(address,(result,status)=>{
-        if(status !=='OK') callBack('위치정보가 올바르지 않습니다.');
-        callBack(result);
+        if(status ==='OK') callBack(result);
     });
 }   
 
@@ -47,26 +44,27 @@ function showYourLocation(pos) {
 }
 
 function showErrorMsg(error) {
+
+    // 서비스 진입 막기
+    $('#loginBtn').attr('disabled','disabled').text('위치정보 수집을 허용해주세요');
+    $('#JKGBtn').attr('disabled','disabled').text('위치정보 수집을 허용해주세요');
+
     // 실패했을때 실행
     switch (error.code) {
     case error.PERMISSION_DENIED:
-        loc.innerHTML =
-        "이 문장은 사용자가 Geolocation API의 사용 요청을 거부했을 때 나타납니다!";
+        alert('위치 엑세스를 허용해주시고 새로고침 해주세요.');
         break;
 
     case error.POSITION_UNAVAILABLE:
-        loc.innerHTML =
-        "이 문장은 가져온 위치 정보를 사용할 수 없을 때 나타납니다!";
+        alert('위치정보 오류 ! 관리자에게 문의 부탁드립니다.');
         break;
 
     case error.TIMEOUT:
-        loc.innerHTML =
-        "이 문장은 위치 정보를 가져오기 위한 요청이 허용 시간을 초과했을 때 나타납니다!";
+        alert('위치정보 획득 시간 초과 ! 관리자에게 문의 부탁드립니다.');
         break;
 
     case error.UNKNOWN_ERROR:
-        loc.innerHTML =
-        "이 문장은 알 수 없는 오류가 발생했을 때 나타납니다!";
+        alert('알 수 없는 오류 ! 관리자에게 문의 부탁드립니다.');
         break;
     }
 }
@@ -76,7 +74,7 @@ function drawMap(addressArray, mapId){
     var container = document.getElementById(`map${mapId}`);
     var options = {
         center: new kakao.maps.LatLng(addressArray[0].x, addressArray[0].y),
-        level: 9,
+        level: 3,
     };
 
     var map = new kakao.maps.Map(container, options);
@@ -94,7 +92,7 @@ function drawMap(addressArray, mapId){
     // 마커가 지도 위에 표시되도록 설정합니다
     marker.setMap(map);
 
-    return drawLine(addressArray,map);
+    drawLine(addressArray,map);
 }
 
 function drawLine(addressArray, map){
@@ -103,10 +101,6 @@ function drawLine(addressArray, map){
     let distance;
     
     const myPosition = new kakao.maps.LatLng(addressArray[0].x, addressArray[0].y);
-
-    // let sortArray = addressArray.
-    
-
 
     for (var i = 1; i < addressArray.length; i++) {
         let hospitalPositions = new kakao.maps.LatLng(addressArray[i].x, addressArray[i].y);
@@ -134,11 +128,6 @@ function drawLine(addressArray, map){
          
     }
     
-    const sortArray = addressArray.sort((a, b)=>{
-        return a.distance < b.distance ? -1 : 1;
-    });
-
-    return sortArray
 }
 
 function displayCircleDot(position, distance, map, hospitalName,hospitalAddr) {
@@ -146,7 +135,8 @@ function displayCircleDot(position, distance, map, hospitalName,hospitalAddr) {
         // 클릭한 지점까지의 그려진 선의 총 거리를 표시할 커스텀 오버레이를 생성합니다
         var distanceOverlay = new daum.maps.CustomOverlay(
                 {
-                    content : `<a style="color:black;" target='_blank' href="https://map.kakao.com/?sName=${myaddress}&eName=${hospitalAddr}"><div style="font-size:15px">${hospitalName}</div><div class="dotOverlay" style="font-size:10px">거리 <span class="number">${distance}</span>m</div></a>`,
+                    // content : `<a style="color:black;" target='_blank' href="https://map.kakao.com/?sName=${myaddress}&eName=${hospitalAddr}"><div style="font-size:15px">${hospitalName}</div><div class="dotOverlay" style="font-size:10px">거리 <span class="number">${distance}</span>m</div></a>`,
+                    content : `<a style="color:black;" target='_blank' href="https://map.kakao.com/?sName=${myaddress}&eName=${hospitalAddr}"><div style="font-size:15px">${hospitalName}</div></a>`,
                     position : position,
                     yAnchor : 1,
                     zIndex : 1

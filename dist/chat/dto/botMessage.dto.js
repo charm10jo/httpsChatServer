@@ -38,6 +38,16 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], BotMessageDto.prototype, "language", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], BotMessageDto.prototype, "latitude", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], BotMessageDto.prototype, "longitude", void 0);
 exports.BotMessageDto = BotMessageDto;
 exports.default = BotMessageDto;
 //# sourceMappingURL=botMessage.dto.js.map

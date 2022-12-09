@@ -4,5 +4,7 @@ export declare class BotMessageDto {
     priority: number;
     region: string;
     language: string;
+    latitude: number;
+    longitude: number;
 }
 export default BotMessageDto;
