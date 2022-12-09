@@ -174,9 +174,11 @@
             }
             
             if(langs.length == 0){
-                return "Only Korean"
+                return "Only Korean";
+            }else {
+                return langs.join(',');
             }
-            return langs
+
         }
 
         // bot 응답 메세지 
