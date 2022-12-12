@@ -9,36 +9,10 @@ import { v2 } from '@google-cloud/translate';
 import { ConfigService } from '@nestjs/config';
 
 let createdRooms: string[] = [];
+const cache_uri = "http://3.208.90.22:5000/"
+const ws_uri = "https://charm10jo-skywalker.shop/"
 
-async function drl_StrToNum(regionByStrType:string, language:string){
-      const addressArray = Object.freeze({
-        "강남구": 0,
-        "강동구": 1,
-        "강북구": 2,
-        "강서구": 3,
-        "관악구": 4,
-        "광진구": 5,
-        "구로구": 6,
-        "금천구": 7,
-        "노원구": 8,
-        "도봉구": 9,
-        "동대문구": 10,
-        "동작구": 11,
-        "마포구": 12,
-        "서대문구": 13,
-        "서초구": 14,
-        "성동구": 15,
-        "성북구": 16,
-        "송파구": 17,
-        "양천구": 18,
-        "영등포구": 19,
-        "용산구": 20,
-        "은평구": 21,
-        "종로구": 22,
-        "중구": 23,
-        "중랑구": 24,
-      });
-    
+function drl_StrToNum(language:string){
     const languageArray = Object.freeze({
         "en": 1,      // 영어
         "zh-CN": 2,   // 중국어 간체
@@ -51,10 +25,8 @@ async function drl_StrToNum(regionByStrType:string, language:string){
         "ja": 9,      // 일본어
     });
 
-    const num_address: number = addressArray[regionByStrType]
     const num_language: number = languageArray[language]
-
-    return { num_address, num_language }
+    return { num_language }
 }
 
 @WebSocketGateway({
@@ -123,26 +95,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             longitude,
             retry
         } = botMessageDto;
-        
-        const divisions = Object.freeze({
-            "내과": 0,
-            "외과": 1,
-            "비뇨의학과": 2,
-            "산부인과": 3,
-            "성형외과": 4,
-            "소아과": 5,
-            "신경과": 6,
-            "안과": 7,
-            "이비인후과": 8,
-            "재활의학과": 9,
-            "정신건강의학과": 10,
-            "정형외과": 11,
-            "치과": 12,
-            "피부과": 13,
-            '약국': 14,
-            "한방과": 15,
-            "응급실": 16
-          });
 
         // 번역 api
         const translateClient = new v2.Translate({
@@ -154,44 +106,36 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             to: 'ko',
         });
         
-        let { num_address, num_language } = await drl_StrToNum(region, language); // by number
+        let { num_language } = drl_StrToNum(language); // by number
 
-        let num_division: number;
+        let hospitalInfo;
 
         if(nmm === 1){
-            num_division = 14
+            hospitalInfo = await firstValueFrom(this.httpService.post(ws_uri,{
+                "priority":priority,
+                "division":14,
+                "language":num_language,
+                "latitude":latitude,
+                "longitude":longitude
+            })); // post 요청으로 web 서버 통신
         } else if (nmm == 3) {
-            num_division = 16
+            hospitalInfo = await firstValueFrom(this.httpService.post(ws_uri,{
+                "priority":priority,
+                "division":16,
+                "language":num_language,
+                "latitude":latitude,
+                "longitude":longitude
+            })); // post 요청으로 web 서버 통신
         } else{
-            const my_division:Object = await firstValueFrom(this.httpService.post("http://54.242.143.192:5000/predict", {
-                symptoms: translation
+            hospitalInfo = await firstValueFrom(this.httpService.post(cache_uri, {
+                "priority":priority,
+                "symptoms":translation,
+                "language":num_language,
+                "latitude":latitude,
+                "longitude":longitude
             }));
-            console.log(my_division['data'])
-            num_division = divisions[my_division['data']]
         }             
-        
-        // retry 값이 true면 검색 결과에 대해서 만족하지 못해서 다시 검색한 경우이므로 캐시서버를 호출할 때 같이 보내서 바로 ai 서버를 볼 수 있게 해준다.
-        const hospitalInfo = await firstValueFrom(this.httpService.post(`https://charm10jo-skywalker.shop`,{
-            "priority":priority,
-            "division":num_division,
-            "language":num_language,
-            "latitude":latitude,
-            "longitude":longitude
-        })); // post 요청으로 web 서버 통신
-        
-        // hospitalInfo.data.result[0].translatAddress = await translateClient.translate(hospitalInfo.data.result[0].address, {
-        //     from: 'ko',
-        //     to: language,
-        // });
-        
-        // for (let e of hospitalInfo.data.result){
-        //     e.translatHospitalName = await translateClient.translate(e.hospitalName, {
-        //         from: 'ko',
-        //         to: language,
-        //     });
-        // }
 
-        console.log(hospitalInfo.data.result)
         socket.emit('botMessage', hospitalInfo.data.result, translation);
     };
 
@@ -252,7 +196,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() loginUserDto: LoginUserDto
     ) {
-        const response = await firstValueFrom(this.httpService.post("https://charm10jo-skywalker.shop/login", loginUserDto))
+        const response = await firstValueFrom(this.httpService.post(ws_uri + "login", loginUserDto))
         const token = response.data['accessToken'];
         const res = {
             success: true,
@@ -268,7 +212,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() data: signupDto,
     ) {
-        await firstValueFrom(this.httpService.post("https://charm10jo-skywalker.shop/signup", data));
+        await firstValueFrom(this.httpService.post(ws_uri + "signup", data));
         socket.emit('signup', {success: true})
     }
 }
