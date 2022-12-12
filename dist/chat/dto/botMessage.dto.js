@@ -48,6 +48,11 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Number)
 ], BotMessageDto.prototype, "longitude", void 0);
+__decorate([
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Boolean)
+], BotMessageDto.prototype, "retry", void 0);
 exports.BotMessageDto = BotMessageDto;
 exports.default = BotMessageDto;
 //# sourceMappingURL=botMessage.dto.js.map

@@ -120,7 +120,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             region,
             language,
             latitude,
-            longitude 
+            longitude,
+            retry
         } = botMessageDto;
         
         const divisions = Object.freeze({
@@ -152,7 +153,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             from: language,
             to: 'ko',
         });
-        console.log(translation)
+        
         let { num_address, num_language } = await drl_StrToNum(region, language); // by number
 
         let num_division: number;
@@ -168,7 +169,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             console.log(my_division['data'])
             num_division = divisions[my_division['data']]
         }             
-
+        
+        // retry 값이 true면 검색 결과에 대해서 만족하지 못해서 다시 검색한 경우이므로 캐시서버를 호출할 때 같이 보내서 바로 ai 서버를 볼 수 있게 해준다.
         const hospitalInfo = await firstValueFrom(this.httpService.post(`https://charm10jo-skywalker.shop`,{
             "priority":priority,
             "division":num_division,
@@ -176,7 +178,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             "latitude":latitude,
             "longitude":longitude
         })); // post 요청으로 web 서버 통신
-          
+        
+        // hospitalInfo.data.result[0].translatAddress = await translateClient.translate(hospitalInfo.data.result[0].address, {
+        //     from: 'ko',
+        //     to: language,
+        // });
+        
+        // for (let e of hospitalInfo.data.result){
+        //     e.translatHospitalName = await translateClient.translate(e.hospitalName, {
+        //         from: 'ko',
+        //         to: language,
+        //     });
+        // }
+
+        console.log(hospitalInfo.data.result)
         socket.emit('botMessage', hospitalInfo.data.result, translation);
     };
 

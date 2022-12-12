@@ -97,7 +97,7 @@ let ChatGateway = class ChatGateway {
         console.log(`${socket.id} 소켓 연결 해제 ❌`);
     }
     async handlebotMessage(socket, botMessageDto) {
-        const { symptoms, nmm, priority, region, language, latitude, longitude } = botMessageDto;
+        const { symptoms, nmm, priority, region, language, latitude, longitude, retry } = botMessageDto;
         const divisions = Object.freeze({
             "내과": 0,
             "외과": 1,
@@ -124,22 +124,9 @@ let ChatGateway = class ChatGateway {
             from: language,
             to: 'ko',
         });
-        console.log(translation);
         let { num_address, num_language } = await drl_StrToNum(region, language);
         let num_division;
-        if (nmm === 1) {
-            num_division = 14;
-        }
-        else if (nmm == 3) {
-            num_division = 16;
-        }
-        else {
-            const my_division = await (0, rxjs_1.firstValueFrom)(this.httpService.post("http://54.242.143.192:5000/predict", {
-                symptoms: translation
-            }));
-            console.log(my_division['data']);
-            num_division = divisions[my_division['data']];
-        }
+        num_division = 14;
         const hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`https://charm10jo-skywalker.shop`, {
             "priority": priority,
             "division": num_division,
@@ -147,6 +134,7 @@ let ChatGateway = class ChatGateway {
             "latitude": latitude,
             "longitude": longitude
         }));
+        console.log(hospitalInfo.data.result);
         socket.emit('botMessage', hospitalInfo.data.result, translation);
     }
     ;

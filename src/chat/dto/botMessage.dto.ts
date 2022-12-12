@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class BotMessageDto {
     // @IsNumber()
@@ -32,7 +32,10 @@ export class BotMessageDto {
     @IsNumber()
     @IsNotEmpty()
     longitude : number;
-                 
+    
+    @IsBoolean()
+    @IsNotEmpty()
+    retry : boolean;
 }
 
 export default BotMessageDto

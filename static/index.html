@@ -15,6 +15,7 @@
   console.log(response)
     );</script>
         <script src="map.js"></script>
+        <script src="lang.js"></script>
         
         
     </head>
@@ -148,16 +149,27 @@
 
         function addButton(myAddr, hospitalAddr){
             const ul = room.querySelector("ul");
-            const a = document.createElement("a");
+            const br = document.createElement('br');
+
+            let a = document.createElement("a");
             a.href = `https://map.kakao.com/?sName=${myAddr}&eName=${hospitalAddr}`;
-            a.innerText = '<추천 의료시설 경로 안내 바로가기>'; 
+            a.innerText = `<${send_form.bot_route}>`; 
             a.setAttribute('target','_blank');
             ul.appendChild(a);
+
+            ul.appendChild(br);
+
+            a = document.createElement("a");
+            a.href = '#';
+            a.innerText = `<${send_form.bot_retry}>`;
+            a.setAttribute('onclick','handleMessageSubmit(event,true)');
+            ul.appendChild(a);
+
         }
 
         function foreignLang(str) {
             let langs = [];
-            const test ={
+            const languageObj ={
                 English:str.language1English,
                 ChineseCN:str.language2ChineseCN,
                 ChineseTW:str.language3ChineseTW,
@@ -169,8 +181,8 @@
                 Japanese:str.language9Japanese
             } 
             
-            for(let e in test){
-                if(test[e] === 1) langs.push(e);
+            for(let e in languageObj){
+                if(languageObj[e] === 1) langs.push(e);
             }
             
             if(langs.length == 0){
@@ -184,21 +196,20 @@
         // bot 응답 메세지 
         function response_bot(data, trdText){
 
-
             const forr = foreignLang(data);
 
             console.log(forr)
             addMessage(`Bot >
-                번역 : ${trdText}
-                병원 이름 : ${data.hospitalName}
-                병원 주소 : ${data.address}
-                진료 가능 언어: ${forr}
+                ${send_form.bot_translation} : ${trdText}
+                ${send_form.bot_hospital_name} : ${data.hospitalName}
+                ${send_form.bot_hospital_addr} : ${data.address}
+                ${send_form.bot_language}: ${forr}
             `);
             
             addButton(myaddress, data.address);
         }
 
-        function handleMessageSubmit(event) {
+        function handleMessageSubmit(event,retry) {
             event.preventDefault();
             // const input = room.querySelector("#msg input");
             // const d = room.querySelector(`#msg input[name="division"]`).value;
@@ -207,8 +218,10 @@
             const priority = room.querySelector(`#msg input[name="EL"]:checked`).value;
             const language = socket['lang'];
             
+            if(typeof retry === 'undefined') retry = false;
+
             // 지역구 정보는 이제 안받는 걸로 알고있는데 ?
-            const region ="강남구"
+            const region ="강남구";
             
             const data = {
                 // division: d,
@@ -218,7 +231,8 @@
                 region,
                 language,
                 latitude,
-                longitude 
+                longitude,
+                retry
             };
                     
             // socket.emit("botMessage", d, s, nmm, priority, region, () => {
@@ -243,6 +257,10 @@
             const lang = form.querySelector(`input[name="langs"]:checked`).parentElement.innerText;
             roomName = lang;
             socket['lang'] = langVal;
+            
+            // 언어에 따라서 화면 언어 수정
+            change_lang(langVal);
+            change_form();
             showRoom(roomName);
             
         }
@@ -309,8 +327,11 @@
         });
 
         socket.on("welcome", (lang) => {
+
             const h3 = room.querySelector("h3");
             h3.innerText = `Room ${lang}`;
+
+            
             // addMessage(`${user} arrived!`);
         });
 

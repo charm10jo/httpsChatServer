@@ -6,5 +6,6 @@ export declare class BotMessageDto {
     language: string;
     latitude: number;
     longitude: number;
+    retry: boolean;
 }
 export default BotMessageDto;
