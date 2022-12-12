@@ -120,7 +120,7 @@
         </main>
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js" integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs" crossorigin="anonymous"></script><script></script>
     <script>    
-        const socket = io('ws://15.165.205.13/chat', {transports: ["websocket"]})
+        const socket = io('/chat')
         // const socket = io('http://localhost:3333/chat');
 
         const welcome = document.getElementById("welcome");
