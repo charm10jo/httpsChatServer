@@ -124,7 +124,7 @@ function drawLine(addressArray, map){
         
         addressArray[i].distance = distance;
         
-        displayCircleDot(hospitalPositions, distance, map,addressArray[i].hospitalName, addressArray[i].hospitalAddr);
+        displayCircleDot(hospitalPositions, distance, map,addressArray[i].hospitalName, addressArray[i].address);
          
     }
     
