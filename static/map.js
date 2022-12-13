@@ -69,11 +69,13 @@ function showErrorMsg(error) {
     }
 }
 
-function drawMap(addressArray, mapId){
+function drawMap(addressArray, mapId, myAddrArray){
+    
     // 카카오 맵 그리기 (내위치)
     var container = document.getElementById(`map${mapId}`);
     var options = {
-        center: new kakao.maps.LatLng(addressArray[0].x, addressArray[0].y),
+        // center: new kakao.maps.LatLng(addressArray[0].x, addressArray[0].y),
+        center: new kakao.maps.LatLng(myAddrArray.x, myAddrArray.y),
         level: 3,
     };
 
@@ -82,7 +84,7 @@ function drawMap(addressArray, mapId){
 
     // 내 위치 마커
     // 마커가 표시될 위치입니다
-    var markerPosition = new kakao.maps.LatLng(addressArray[0].x, addressArray[0].y);
+    var markerPosition = new kakao.maps.LatLng(myAddrArray.x, myAddrArray.y);
 
     // 마커를 생성합니다
     var marker = new kakao.maps.Marker({
@@ -92,22 +94,20 @@ function drawMap(addressArray, mapId){
     // 마커가 지도 위에 표시되도록 설정합니다
     marker.setMap(map);
 
-    drawLine(addressArray,map);
+    drawLine(addressArray,map,myAddrArray);
 }
 
-function drawLine(addressArray, map){
+function drawLine(addressArray, map, myAddrArray){
     let linePath;
     let lineLine = new daum.maps.Polyline();
     let distance;
     
-    const myPosition = new kakao.maps.LatLng(addressArray[0].x, addressArray[0].y);
+    const myPosition = new kakao.maps.LatLng(myAddrArray.x, myAddrArray.y);
 
-    for (var i = 1; i < addressArray.length; i++) {
+    for (var i = 0; i < addressArray.length; i++) {
         let hospitalPositions = new kakao.maps.LatLng(addressArray[i].x, addressArray[i].y);
-        if (i != 0) {
-            linePath = [ myPosition, hospitalPositions ] //라인을 그리려면 두 점이 있어야하니까 두 점을 지정했습니다
-        };
-
+        
+        linePath = [ myPosition, hospitalPositions ] //라인을 그리려면 두 점이 있어야하니까 두 점을 지정했습니다
         lineLine.setPath(linePath); // 선을 그릴 라인을 세팅합니다
  
         var drawLine = new daum.maps.Polyline({

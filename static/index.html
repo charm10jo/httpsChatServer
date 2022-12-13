@@ -370,21 +370,19 @@
         });
         
         socket.on("botMessage", (res,trdText) => {
-            let addressArray = [{x:latitude, y:longitude, hospitalName:'내위치'}]
+            let myAddrArray = {x:latitude, y:longitude}
             
-            res.forEach(e => {
-                coordinate(e.address,(data)=>{
-                if(addressArray.length < 6){
-                    addressArray.push({x: Number(data[0].y) , y:Number(data[0].x), ... e})
-                }else{
-                    return true
-                } })
-            });
-        
+            for(let e in res){
+                coordinate(res[e].address, (data)=>{
+                    res[e] = ({x: Number(data[0].y) , y:Number(data[0].x), ... res[e]})  
+                })
+            }
+            let sortAddrArray = res.sort((a,b)=> a.distance > b.distance ? 1 : a.distance < b.distance ? -1 : 0 );
+            
         setTimeout(() => {
                 createMapDiv(mapId);
-                drawMap(addressArray, mapId, trdText);
-                response_bot(addressArray[1], trdText);
+                drawMap(sortAddrArray, mapId, myAddrArray);
+                response_bot(sortAddrArray[0], trdText);
                 mapId ++;
             }, 150);
         });
