@@ -109,7 +109,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
         let hospitalInfo;
 
-        if(nmm === 1){
+        if(nmm == 1){
             hospitalInfo = await firstValueFrom(this.httpService.post(ws_uri,{
                 "priority":priority,
                 "division":14,

@@ -81,7 +81,7 @@ let ChatGateway = class ChatGateway {
         });
         let { num_language } = drl_StrToNum(language);
         let hospitalInfo;
-        if (nmm === 1) {
+        if (nmm == 1) {
             hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri, {
                 "priority": priority,
                 "division": 14,
