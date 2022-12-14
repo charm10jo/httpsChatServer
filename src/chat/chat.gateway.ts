@@ -89,7 +89,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             symptoms,
             nmm,
             priority,
-            region,
             language,
             latitude,
             longitude,
@@ -120,8 +119,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             })); // post 요청으로 web 서버 통신
         } else if (nmm == 3) {
             hospitalInfo = await firstValueFrom(this.httpService.post(ws_uri,{
-                "priority":priority,
-                "division":16,
+                "priority":3,
                 "language":num_language,
                 "latitude":latitude,
                 "longitude":longitude

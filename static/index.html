@@ -219,16 +219,12 @@
             const language = socket['lang'];
             
             if(typeof retry === 'undefined') retry = false;
-
-            // 지역구 정보는 이제 안받는 걸로 알고있는데 ?
-            const region ="강남구";
             
             const data = {
                 // division: d,
                 symptoms: s,
                 nmm,
                 priority,
-                region,
                 language,
                 latitude,
                 longitude,
