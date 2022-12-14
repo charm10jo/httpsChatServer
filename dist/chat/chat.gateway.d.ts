@@ -1,10 +1,10 @@
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from "@nestjs/websockets";
 import { Socket, Namespace } from "socket.io";
 import { HttpService } from "@nestjs/axios";
-import signupDto from './dto/signup.dto';
+import signupDto from "./dto/signup.dto";
 import BotMessageDto from "./dto/botMessage.dto";
 import { LoginUserDto } from "./dto/loginuser.dto";
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from "@nestjs/config";
 export declare class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     private readonly httpService;
     private readonly configService;

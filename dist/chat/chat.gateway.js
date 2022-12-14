@@ -22,49 +22,25 @@ const botMessage_dto_1 = require("./dto/botMessage.dto");
 const loginuser_dto_1 = require("./dto/loginuser.dto");
 const translate_1 = require("@google-cloud/translate");
 const config_1 = require("@nestjs/config");
+const bcrypt = require("bcryptjs");
+const common_1 = require("@nestjs/common");
 let createdRooms = [];
-async function drl_StrToNum(regionByStrType, language) {
-    const addressArray = Object.freeze({
-        "강남구": 0,
-        "강동구": 1,
-        "강북구": 2,
-        "강서구": 3,
-        "관악구": 4,
-        "광진구": 5,
-        "구로구": 6,
-        "금천구": 7,
-        "노원구": 8,
-        "도봉구": 9,
-        "동대문구": 10,
-        "동작구": 11,
-        "마포구": 12,
-        "서대문구": 13,
-        "서초구": 14,
-        "성동구": 15,
-        "성북구": 16,
-        "송파구": 17,
-        "양천구": 18,
-        "영등포구": 19,
-        "용산구": 20,
-        "은평구": 21,
-        "종로구": 22,
-        "중구": 23,
-        "중랑구": 24,
-    });
+const cache_uri = "http://3.208.90.22:5000/";
+const ws_uri = "https://charm10jo-skywalker.shop/";
+function drl_StrToNum(language) {
     const languageArray = Object.freeze({
-        "en": 1,
+        en: 1,
         "zh-CN": 2,
         "zh-TW": 3,
-        "vi": 4,
-        "mn": 5,
-        "th": 6,
-        "ru": 7,
-        "kk": 8,
-        "ja": 9,
+        vi: 4,
+        mn: 5,
+        th: 6,
+        ru: 7,
+        kk: 8,
+        ja: 9,
     });
-    const num_address = addressArray[regionByStrType];
     const num_language = languageArray[language];
-    return { num_address, num_language };
+    return { num_language };
 }
 let ChatGateway = class ChatGateway {
     constructor(httpService, configService) {
@@ -72,23 +48,23 @@ let ChatGateway = class ChatGateway {
         this.configService = configService;
     }
     afterInit() {
-        this.nsp.adapter.on('create-room', (room) => {
+        this.nsp.adapter.on("create-room", (room) => {
             console.log(`"Room:${room}"이 생성되었습니다.`);
         });
-        this.nsp.adapter.on('join-room', (room, id) => {
+        this.nsp.adapter.on("join-room", (room, id) => {
             console.log(`"Socket:${id}"이 "Room:${room}"에 참여하였습니다.`);
         });
-        this.nsp.adapter.on('leave-room', (room, id) => {
+        this.nsp.adapter.on("leave-room", (room, id) => {
             console.log(`"Socket:${id}"이 "Room:${room}"에서 나갔습니다.`);
         });
-        this.nsp.adapter.on('delete-room', (room) => {
+        this.nsp.adapter.on("delete-room", (room) => {
             const deletedRoom = createdRooms.find((createdRoom) => createdRoom === room);
             if (!deletedRoom)
                 return;
-            this.nsp.emit('delete-room', deletedRoom);
+            this.nsp.emit("delete-room", deletedRoom);
             createdRooms = createdRooms.filter((createdRoom) => createdRoom !== deletedRoom);
         });
-        console.log('웹소켓 서버 초기화 ✅');
+        console.log("웹소켓 서버 초기화 ✅");
     }
     handleConnection(socket) {
         console.log(`${socket.id} 소켓 연결`);
@@ -97,55 +73,53 @@ let ChatGateway = class ChatGateway {
         console.log(`${socket.id} 소켓 연결 해제 ❌`);
     }
     async handlebotMessage(socket, botMessageDto) {
-        const { symptoms, nmm, priority, region, language, latitude, longitude, retry } = botMessageDto;
-        const divisions = Object.freeze({
-            "내과": 0,
-            "외과": 1,
-            "비뇨의학과": 2,
-            "산부인과": 3,
-            "성형외과": 4,
-            "소아과": 5,
-            "신경과": 6,
-            "안과": 7,
-            "이비인후과": 8,
-            "재활의학과": 9,
-            "정신건강의학과": 10,
-            "정형외과": 11,
-            "치과": 12,
-            "피부과": 13,
-            '약국': 14,
-            "한방과": 15,
-            "응급실": 16
-        });
+        const { symptoms, nmm, priority, region, language, latitude, longitude, retry, } = botMessageDto;
         const translateClient = new translate_1.v2.Translate({
-            key: this.configService.get('Translate_KEY')
+            key: this.configService.get("Translate_KEY"),
         });
         const [translation] = await translateClient.translate(symptoms, {
             from: language,
-            to: 'ko',
+            to: "ko",
         });
-        let { num_address, num_language } = await drl_StrToNum(region, language);
-        let num_division;
-        num_division = 14;
-        const hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`https://charm10jo-skywalker.shop`, {
-            "priority": priority,
-            "division": num_division,
-            "language": num_language,
-            "latitude": latitude,
-            "longitude": longitude
-        }));
-        console.log(hospitalInfo.data.result);
-        socket.emit('botMessage', hospitalInfo.data.result, translation);
+        let { num_language } = drl_StrToNum(language);
+        let hospitalInfo;
+        if (nmm === 1) {
+            hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri, {
+                priority: priority,
+                division: 14,
+                language: num_language,
+                latitude: latitude,
+                longitude: longitude,
+            }));
+        }
+        else if (nmm == 3) {
+            hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri, {
+                priority: priority,
+                division: 16,
+                language: num_language,
+                latitude: latitude,
+                longitude: longitude,
+            }));
+        }
+        else {
+            hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(cache_uri, {
+                priority: priority,
+                symptoms: translation,
+                language: num_language,
+                latitude: latitude,
+                longitude: longitude,
+            }));
+        }
+        socket.emit("botMessage", hospitalInfo.data.result, translation);
     }
-    ;
     handleMessage(socket, { roomName, message }) {
-        socket.broadcast.to(roomName).emit('message', { username: socket.id, message });
+        socket.broadcast
+            .to(roomName)
+            .emit("message", { username: socket.id, message });
     }
-    ;
     handleRoomList() {
         return createdRooms;
     }
-    ;
     handleCreateRoom(socket, roomName) {
         const exists = createdRooms.find((createdRoom) => createdRoom === roomName);
         if (exists) {
@@ -153,33 +127,62 @@ let ChatGateway = class ChatGateway {
         }
         socket.join(roomName);
         createdRooms.push(roomName);
-        this.nsp.emit('create-room', roomName);
+        this.nsp.emit("create-room", roomName);
         return { success: true, payload: roomName };
     }
     handleJoinRoom(socket, roomName) {
         socket.join(roomName);
-        socket.emit('message', { message: `${socket.id}가 들어왔습니다.` });
+        socket.emit("message", { message: `${socket.id}가 들어왔습니다.` });
         return { success: true };
     }
-    ;
     handleLeaveRoom(socket, roomName) {
         socket.leave(roomName);
-        socket.broadcast.to(roomName).emit('message', { message: `${socket.id}가 나갔습니다.` });
+        socket.broadcast
+            .to(roomName)
+            .emit("message", { message: `${socket.id}가 나갔습니다.` });
         return { success: true };
     }
     async handleLogin(socket, loginUserDto) {
-        const response = await (0, rxjs_1.firstValueFrom)(this.httpService.post("https://charm10jo-skywalker.shop/login", loginUserDto));
-        const token = response.data['accessToken'];
-        const res = {
-            success: true,
-            token,
-            nick: loginUserDto.Id
-        };
-        socket.emit("login", res);
+        const { Id, password } = loginUserDto;
+        if (!Id || !password)
+            throw new Error('입력값이 없어요. 소켓은 어떻게 통과했담?');
+        const response = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri + "login", loginUserDto));
+        const token = response.data["accessToken"];
+        const hashedPassword = response.data["hashedPassword"];
+        if (token && (await bcrypt.compare(password, hashedPassword))) {
+            const res = {
+                success: true,
+                token,
+                nick: loginUserDto.Id,
+            };
+            socket.emit("login", res);
+        }
+        else {
+            throw new common_1.UnauthorizedException('회원정보가 일치하지 않습니다.');
+        }
     }
     async handleSignUp(socket, data) {
-        await (0, rxjs_1.firstValueFrom)(this.httpService.post("https://charm10jo-skywalker.shop/signup", data));
-        socket.emit('signup', { success: true });
+        const { Id, password, confirm, gender, birthday, korIns, privIns, phoneNumber, name, } = data;
+        if (!Id || !password || !confirm)
+            throw new Error("입력값이 없어요. 소켓은 어떻게 통과했담?");
+        if (password !== confirm)
+            throw new Error("비번이 확인란과 불일치하는데요");
+        const salt = await bcrypt.genSalt(+this.configService.get("SALT"));
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedConfirm = await bcrypt.hash(confirm, salt);
+        const user = {
+            Id,
+            hashedPassword,
+            hashedConfirm,
+            gender,
+            birthday,
+            korIns,
+            privIns,
+            phoneNumber,
+            name,
+        };
+        await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri + "signup", user));
+        socket.emit("signup", { success: true });
     }
 };
 __decorate([
@@ -199,7 +202,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleDisconnect", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('botMessage'),
+    (0, websockets_1.SubscribeMessage)("botMessage"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -208,7 +211,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handlebotMessage", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('message'),
+    (0, websockets_1.SubscribeMessage)("message"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -216,13 +219,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleMessage", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('room-list'),
+    (0, websockets_1.SubscribeMessage)("room-list"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleRoomList", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('create-room'),
+    (0, websockets_1.SubscribeMessage)("create-room"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -230,7 +233,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleCreateRoom", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('join-room'),
+    (0, websockets_1.SubscribeMessage)("join-room"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -238,7 +241,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleJoinRoom", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('leave-room'),
+    (0, websockets_1.SubscribeMessage)("leave-room"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -246,7 +249,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleLeaveRoom", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('login'),
+    (0, websockets_1.SubscribeMessage)("login"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -255,7 +258,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleLogin", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('signup'),
+    (0, websockets_1.SubscribeMessage)("signup"),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
@@ -267,8 +270,8 @@ ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         namespace: "chat",
         cors: {
-            origin: ['*']
-        }
+            origin: ["*"],
+        },
     }),
     __metadata("design:paramtypes", [axios_1.HttpService,
         config_1.ConfigService])

@@ -31,6 +31,7 @@
     "@nestjs/platform-ws": "^9.2.0",
     "@nestjs/websockets": "^9.2.0",
     "axios": "^1.2.0",
+    "bcryptjs": "^2.4.3",
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
