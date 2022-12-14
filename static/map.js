@@ -29,11 +29,16 @@ function getAddr(lat,lng){
 // 좌표 얻어오기
 function coordinate(address,callBack){
     let geocoder = new kakao.maps.services.Geocoder();
-    geocoder.addressSearch(address,(result,status)=>{
-        if(status ==='OK') callBack(result);
-    });
-}   
-
+    return new Promise((resolve, reject)=>{
+        geocoder.addressSearch(address,(result,status)=>{
+            if(status !== "OK") {
+                resolve(result)
+            }else{
+                resolve({x:result[0].y,y:result[0].x,status})
+            }            
+        });        
+    })
+}
 // geolocation
 function showYourLocation(pos) {
     // 성공했을때 실행

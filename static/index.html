@@ -365,16 +365,21 @@
             }
         });
         
-        socket.on("botMessage", (res,trdText) => {
+        socket.on("botMessage", async (res,trdText) => {
+            
             let myAddrArray = {x:latitude, y:longitude}
-            
-            for(let e in res){
-                coordinate(res[e].address, (data)=>{
-                    res[e] = ({x: Number(data[0].y) , y:Number(data[0].x), ... res[e]})  
-                })
+
+            // NaN 으로 나오는 건 소켓과 웹브라우저의 통신에서 데이터 변환이 이루어지기 때문이다 ?
+            // 메소드 반복 -> 비동기 처리 x 
+            // for문은 하나하나 기다린다 
+
+            for (let e in res){
+                let test = await coordinate(res[e].address);
+                res[e] = {...test, ...res[e]}
             }
-            let sortAddrArray = res.sort((a,b)=> a.distance > b.distance ? 1 : a.distance < b.distance ? -1 : 0 );
             
+            let sortAddrArray = res.filter((e)=>{ return e.status === "OK" ? 1 : 0}).sort((a,b)=> a.distance > b.distance ? 1 : a.distance < b.distance ? -1 : 0 );
+
         setTimeout(() => {
                 createMapDiv(mapId);
                 drawMap(sortAddrArray, mapId, myAddrArray);
