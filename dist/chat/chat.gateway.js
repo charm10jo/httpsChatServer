@@ -23,34 +23,9 @@ const loginuser_dto_1 = require("./dto/loginuser.dto");
 const translate_1 = require("@google-cloud/translate");
 const config_1 = require("@nestjs/config");
 let createdRooms = [];
-async function drl_StrToNum(regionByStrType, language) {
-    const addressArray = Object.freeze({
-        "강남구": 0,
-        "강동구": 1,
-        "강북구": 2,
-        "강서구": 3,
-        "관악구": 4,
-        "광진구": 5,
-        "구로구": 6,
-        "금천구": 7,
-        "노원구": 8,
-        "도봉구": 9,
-        "동대문구": 10,
-        "동작구": 11,
-        "마포구": 12,
-        "서대문구": 13,
-        "서초구": 14,
-        "성동구": 15,
-        "성북구": 16,
-        "송파구": 17,
-        "양천구": 18,
-        "영등포구": 19,
-        "용산구": 20,
-        "은평구": 21,
-        "종로구": 22,
-        "중구": 23,
-        "중랑구": 24,
-    });
+const cache_uri = "http://3.208.90.22:5000/";
+const ws_uri = "https://charm10jo-skywalker.shop/";
+function drl_StrToNum(language) {
     const languageArray = Object.freeze({
         "en": 1,
         "zh-CN": 2,
@@ -62,9 +37,8 @@ async function drl_StrToNum(regionByStrType, language) {
         "kk": 8,
         "ja": 9,
     });
-    const num_address = addressArray[regionByStrType];
     const num_language = languageArray[language];
-    return { num_address, num_language };
+    return { num_language };
 }
 let ChatGateway = class ChatGateway {
     constructor(httpService, configService) {
@@ -97,26 +71,7 @@ let ChatGateway = class ChatGateway {
         console.log(`${socket.id} 소켓 연결 해제 ❌`);
     }
     async handlebotMessage(socket, botMessageDto) {
-        const { symptoms, nmm, priority, region, language, latitude, longitude, retry } = botMessageDto;
-        const divisions = Object.freeze({
-            "내과": 0,
-            "외과": 1,
-            "비뇨의학과": 2,
-            "산부인과": 3,
-            "성형외과": 4,
-            "소아과": 5,
-            "신경과": 6,
-            "안과": 7,
-            "이비인후과": 8,
-            "재활의학과": 9,
-            "정신건강의학과": 10,
-            "정형외과": 11,
-            "치과": 12,
-            "피부과": 13,
-            '약국': 14,
-            "한방과": 15,
-            "응급실": 16
-        });
+        const { symptoms, nmm, priority, language, latitude, longitude, retry } = botMessageDto;
         const translateClient = new translate_1.v2.Translate({
             key: this.configService.get('Translate_KEY')
         });
@@ -124,17 +79,35 @@ let ChatGateway = class ChatGateway {
             from: language,
             to: 'ko',
         });
-        let { num_address, num_language } = await drl_StrToNum(region, language);
-        let num_division;
-        num_division = 14;
-        const hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`https://charm10jo-skywalker.shop`, {
-            "priority": priority,
-            "division": num_division,
-            "language": num_language,
-            "latitude": latitude,
-            "longitude": longitude
-        }));
-        console.log(hospitalInfo.data.result);
+        let { num_language } = drl_StrToNum(language);
+        let hospitalInfo;
+        if (nmm === 1) {
+            hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri, {
+                "priority": priority,
+                "division": 14,
+                "language": num_language,
+                "latitude": latitude,
+                "longitude": longitude
+            }));
+        }
+        else if (nmm == 3) {
+            hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri, {
+                "priority": 3,
+                "division": 16,
+                "language": num_language,
+                "latitude": latitude,
+                "longitude": longitude
+            }));
+        }
+        else {
+            hospitalInfo = await (0, rxjs_1.firstValueFrom)(this.httpService.post(cache_uri, {
+                "priority": priority,
+                "symptoms": translation,
+                "language": num_language,
+                "latitude": latitude,
+                "longitude": longitude
+            }));
+        }
         socket.emit('botMessage', hospitalInfo.data.result, translation);
     }
     ;
@@ -168,7 +141,7 @@ let ChatGateway = class ChatGateway {
         return { success: true };
     }
     async handleLogin(socket, loginUserDto) {
-        const response = await (0, rxjs_1.firstValueFrom)(this.httpService.post("https://charm10jo-skywalker.shop/login", loginUserDto));
+        const response = await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri + "login", loginUserDto));
         const token = response.data['accessToken'];
         const res = {
             success: true,
@@ -178,7 +151,7 @@ let ChatGateway = class ChatGateway {
         socket.emit("login", res);
     }
     async handleSignUp(socket, data) {
-        await (0, rxjs_1.firstValueFrom)(this.httpService.post("https://charm10jo-skywalker.shop/signup", data));
+        await (0, rxjs_1.firstValueFrom)(this.httpService.post(ws_uri + "signup", data));
         socket.emit('signup', { success: true });
     }
 };

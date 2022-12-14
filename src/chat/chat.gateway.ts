@@ -120,6 +120,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         } else if (nmm == 3) {
             hospitalInfo = await firstValueFrom(this.httpService.post(ws_uri,{
                 "priority":3,
+                "division":16,
                 "language":num_language,
                 "latitude":latitude,
                 "longitude":longitude

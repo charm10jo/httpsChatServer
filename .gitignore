@@ -2,7 +2,8 @@ node_modules/
 .translate.env
 
 # compiled output
-/dist
+dist/
+dist/*
 
 # Logs
 logs
