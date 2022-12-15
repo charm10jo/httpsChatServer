@@ -9,7 +9,7 @@ import { v2 } from '@google-cloud/translate';
 import { ConfigService } from '@nestjs/config';
 
 let createdRooms: string[] = [];
-const cache_uri = "http://3.208.90.22:5000/"
+const cache_uri = "https://charm10jo-caches.site/"
 const ws_uri = "https://charm10jo-skywalker.shop/"
 
 function drl_StrToNum(language:string){
