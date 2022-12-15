@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>charm10jo</title>
-        <link rel="stylesheet", href="https://unpkg.com/mvp.css">
+        <!-- <link rel="stylesheet", href="https://unpkg.com/mvp.css"> -->
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
@@ -15,8 +15,11 @@
   console.log(response)
     );</script>
         <script src="map.js"></script>
+        <script src="translating.js"></script>
+        <script src="available.js"></script>
         <script src="lang.js"></script>
-        
+        <script src="index.js"></script>
+        <link rel="stylesheet" href="index.css">
         
     </head>
     <body>
@@ -31,88 +34,88 @@
                 <h2>Login Page</h2>
                 <h3>If you don't need to signup, click "Just Keep Going" Button plz.</h3>
                 <form id="loginForm_login">
-                    <label>nickname <input id="nick", required, type="text", name="login_user"></label>
-                    <label>password <input id="password", required, type="password", name="login_user"></label>
-                    <button id="loginBtn">Login</button>
-                </form>
-
-                <form id="loginForm_signup">
-                    <button>SignUp</button>
-                </form>
-
-                <form id="loginForm_JKG">
-                    <button id="JKGBtn">Just Keep Going</button>
+                    <div>
+                        <div>
+                            <label style="font-size: 20px;">nickname : <input style="height: 25px;" id="nick", required, type="text", name="login_user"></label>
+                            <label style="font-size: 20px;">password : <input style="height: 25px;" id="password", required, type="password", name="login_user"></label>
+                        </div>
+                        <button id="loginBtn" onclick="login(event)">Login</button>
+                    </div>
+                    <div class="loginForm_button">
+                        <button id="loginForm_signup" onclick="gosignupFrom(event)">SignUp</button>
+                        <button id="loginForm_JKG" onclick="notlogin(event)">Just Keep Going</button>
+                    </div>
                 </form>
             </div>
 
-            <div id="signupPage" , style="display:none">
+            <div id="signupPage">
                 <h2>SignUp</h2>
                 <form>
-                    <label>nickname <input id="sign_nick", required, type="text", name="sign_user"></label>
-                        
-                    <label>password <input id="sign_password", required, type="password", name="sign_user"></label>
-
-                    <label>Confirm Password <input id="sign_confirmPassword", required, type="password", name="sign_user"></label>
-
-                    <h3>gender</h3>
-
-                        <label>male <input id="gender_male", type="radio", name="gender", value="1"></label>
-                            
-                        <label>female <input id="gender_female", type="radio", name="gender", value="2"></label>
-                        
-                        <label>other <input id="gender_others", type="radio", name="gender", value="3"></label>
-                            
                     
-                    <h3>Living At</h3>
-                        <input id="living", type="text", name="livingAt">
-                    <h3>Birthday</h3>
-                        <input id="birth", type="date", name="birth">
-                    <h3>Korean Insurance</h3>
-                        <input id="KI", type="checkbox", name="KI", checked="false">
-                    <h3>Private Insurance</h3>
-                        <input id="PI", type="checkbox", name="PI", checked="false">
-                    <h3>PhoneNumber</h3>
-                        <input id="Phone", type="text", name="phone">
-                    <h3>Name</h3>
-                        <input id="userName", type="text", name="userName">
+                    <input id="sign_nick", required, type="text", name="sign_user" placeholder="nick name">
+                    <input id="sign_password", required, type="password", name="sign_user" placeholder="password">
+                    <input id="sign_confirmPassword", required, type="password", name="sign_user" placeholder="Confirm Password">
+                    <input id="userName", type="text", name="userName" placeholder="Name">
+                    <input id="Phone", type="text", name="phone" placeholder="PhoneNumber">
+                    <input id="birth", type="date", name="birth" placeholder="Birthday">
+
+                    <div class="gender_div">
+                        <h3>gender : </h3>
+                        <label><input id="gender_male", type="radio", name="gender", value="1"> male</label>
+                        <label><input id="gender_female", type="radio", name="gender", value="2"> female</label>
+                        <label><input id="gender_others", type="radio", name="gender", value="3" checked="false"> other</label>
+                    </div>
+                    
+                    <!-- <input id="living", type="text", name="livingAt" placeholder="Living At"> -->
+                    <div class="checkbox">
+                        <h3>Korean Insurance</h3><input id="KI", type="checkbox", name="KI", checked="false">
+                    </div>
+                    <div class="checkbox">
+                        <h3>Private Insurance</h3><input id="PI", type="checkbox", name="PI", checked="false">
+                    </div>
                     
                     <button id="signupButton">Done</button>
                 </form>
             </div>
-            <div id="welcome", style="display:none">
+            <div id="welcome">
                 <form>
                     <h2>Choose your language</h2>
                     <div id="Languages">
-                        <label>English <input required, type="radio", name="langs", value="en"></label>
-                        <label>Chinese: Traditional <input required, type="radio", name="langs", value="zh-TW"></label>
-                        <label>Chinese: Simplified <input required, type="radio", name="langs", value="zh-CN"></label>
-                        <label>Vietnamese <input required, type="radio", name="langs", value="vi"></label>
-                        <label>Mongolian <input required, type="radio", name="langs", value="mn"></label>
-                        <label>Thai <input required, type="radio", name="langs", value="th"></label>
-                        <label>Russian <input required, type="radio", name="langs", value="ru"></label>
-                        <label>Kazakh <input required, type="radio", name="langs", value="kk"></label>
-                        <label>Japanese <input required, type="radio", name="langs", value="ja"></label>
+                        <div>
+                            <label><input required, type="radio", name="langs", value="en">English</label>
+                            <label> <input required, type="radio", name="langs", value="zh-TW">Chinese: Traditional</label>
+                            <label> <input required, type="radio", name="langs", value="zh-CN">Chinese: Simplified</label>
+                        </div>
+                        <div>
+                            <label> <input required, type="radio", name="langs", value="vi">Vietnamese</label>
+                            <label> <input required, type="radio", name="langs", value="mn">Mongolian</label>
+                            <label> <input required, type="radio", name="langs", value="th">Thai</label>
+                            <label> <input required, type="radio", name="langs", value="ru">Russian</label>
+                            <label> <input required, type="radio", name="langs", value="kk">Kazakh</label>
+                            <label> <input required, type="radio", name="langs", value="ja">Japanese</label>
+                        </div>
                     </div>
                     <button>Enter Room</button>
                 </form>
             </div>
 
-            <div id="room", style="display:none">
-                <h3></h3>
-                <ul></ul>
+            <div id="room">
+                <ul>
+                    
+                </ul>
                 <form id="msg">
-                    <textarea placeholder="Symptoms", required, name="Symptoms"></textarea>
+                    <textarea id="Symptoms" placeholder="Symptoms" required name="Symptoms"></textarea>
                     <!-- <input required, type="text", name="division", placeholder="divisions"> -->
                     <h3>Necessary Medical Measures</h3>
                     <div>
-                        <label for="NMM1">just some medicines <input id="NMM1", required, type="radio", name="NMM", value="1"></label>
-                        <label for="NMM2">need Doctor's medical measures <input id="NMM2", required, type="radio", name="NMM", value="2"></label>
-                        <label for="NMM3">Emergency Room <input id="NMM3", required, type="radio", name="NMM", value="3"></label>
+                        <label for="NMM1"><input id="NMM1", required, type="radio", name="NMM", value="1" checked>just some medicines</label>
+                        <label for="NMM2"><input id="NMM2", required, type="radio", name="NMM", value="2">need Doctor's medical measures</label>
+                        <label for="NMM3"><input id="NMM3", required, type="radio", name="NMM", value="3">Emergency Room</label>
                     </div>
                     <h3>Searching Priority</h3>
                     <div>
-                        <label for="EL1">Near Distance <input id="EL1", required, type="radio", name="EL", value="1"></label>
-                        <label for="EL2">Support your Language <input id="EL2", required, type="radio", name="EL", value="2"></label>
+                        <label for="EL1"><input id="EL1", required, type="radio", name="EL", value="1" checked>Near Distance</label>
+                        <label for="EL2"><input id="EL2", required, type="radio", name="EL", value="2">Support your Language</label>
                     </div>
                     <button>Send</button>
                 </form>
@@ -131,39 +134,83 @@
 
         let roomName;
         let mapId =0;
-        function addMessage(message) {
-            const ul = room.querySelector("ul");
-            const li = document.createElement("li");
-            li.innerText = message;
-            ul.appendChild(li);
-        }
 
-        function createMapDiv(mapId){
+        function createMapDiv(mapId, data, trdText){
             // <div id="map" style="width:100%;height:350px;"></div>
+            let data_division = data.division.split(',');
+            let translateDivision = [];
+            let supportLanguages = [];
+            console.log(data)
+
+
+            for(let e of data_division){
+                translateDivision.push(translate_division(translat_lang,e.trim()))
+            }
+
             const ul = room.querySelector("ul");
+
+            let temp = `
+                <li class="bot_message">
+                    <div id="map${mapId}" style="width:100%;height:350px;"></div>
+                </li>`;
+            const li = document.createElement("li");
+            
+            li.classList = "bot_message";
+            
             const div = document.createElement("div");
             div.id = `map${mapId}`;
-            div.style = "width:60%;height:350px;";
-            ul.appendChild(div);
-        }
+            div.style = "width:90%;height:350px;";
 
-        function addButton(myAddr, hospitalAddr){
-            const ul = room.querySelector("ul");
-            const br = document.createElement('br');
+            const botdiv = document.createElement("div");
+            botdiv.innerText = 'Bot : \n'
+            botdiv.style = "font-size:20px"
+
+            li.appendChild(botdiv);
+            li.appendChild(div);
+            
+
+            // bot msg
+            const botli = document.createElement("li");
+            const forr = foreignLang(data);
+            const bot_forr = [];
+            console.log(forr)
+            if(forr === "Only Korean"){
+                bot_forr.push(support_languages(translat_lang,forr));
+            }else{
+                for(let e of forr){
+                    bot_forr.push(support_languages(translat_lang,e.trim()));
+                }
+            }
+            
+            console.log(bot_forr)
+
+            botli.innerText = `
+                    ${send_form.bot_translation} : ${trdText}
+                    ${send_form.bot_hospital_name} : ${data.hospitalName}
+                    ${send_form.bot_hospital_addr} : ${data.address}
+                    ${send_form.bot_medical_department} : ${translateDivision.join(',')}
+                    ${send_form.bot_language} : ${bot_forr.join(",")}
+                `;
+                
+            li.appendChild(botli);
+
+            // addbtu
+            // const br = document.createElement('br');
 
             let a = document.createElement("a");
-            a.href = `https://map.kakao.com/?sName=${myAddr}&eName=${hospitalAddr}`;
+            a.href = `https://map.kakao.com/?sName=${myaddress}&eName=${data.address}`;
             a.innerText = `<${send_form.bot_route}>`; 
             a.setAttribute('target','_blank');
-            ul.appendChild(a);
-
-            ul.appendChild(br);
+            li.appendChild(a);
 
             a = document.createElement("a");
             a.href = '#';
             a.innerText = `<${send_form.bot_retry}>`;
             a.setAttribute('onclick','handleMessageSubmit(event,true)');
-            ul.appendChild(a);
+            li.appendChild(a);
+
+
+            ul.appendChild(li);
 
         }
 
@@ -188,38 +235,28 @@
             if(langs.length == 0){
                 return "Only Korean";
             }else {
-                return langs.join(',');
+                return langs;
             }
 
         }
 
-        // bot 응답 메세지 
-        function response_bot(data, trdText){
-
-            const forr = foreignLang(data);
-
-            console.log(forr)
-            addMessage(`Bot >
-                ${send_form.bot_translation} : ${trdText}
-                ${send_form.bot_hospital_name} : ${data.hospitalName}
-                ${send_form.bot_hospital_addr} : ${data.address}
-                ${send_form.bot_language}: ${forr}
-            `);
-            
-            addButton(myaddress, data.address);
-        }
+        
 
         function handleMessageSubmit(event,retry) {
             event.preventDefault();
-            // const input = room.querySelector("#msg input");
-            // const d = room.querySelector(`#msg input[name="division"]`).value;
-            const s = room.querySelector(`#msg textarea[name="Symptoms"]`).value;
+            const s = $("#Symptoms").val() //room.querySelector(`#msg textarea[name="Symptoms"]`).value;
+
             const nmm = room.querySelector(`#msg input[name="NMM"]:checked`).value;
             const priority = room.querySelector(`#msg input[name="EL"]:checked`).value;
             const language = socket['lang'];
             
+            // 이거는 캐시서버에서 무조건 ai 태울때 사용하려고 했던거심 ..
             if(typeof retry === 'undefined') retry = false;
-            
+            if(s === ''){
+                $("#Symptoms").focus();
+                return false;
+            }
+
             const data = {
                 // division: d,
                 symptoms: s,
@@ -231,16 +268,22 @@
                 retry
             };
                     
-            // socket.emit("botMessage", d, s, nmm, priority, region, () => {
-            //     addMessage(`You: ${s.value}`);
-            // });
 
             socket.emit("botMessage", data);
+
+            
+            const ul = room.querySelector("ul");
+            const li = document.createElement("li");
+            li.classList = "client_message";
+            li.innerText = s;
+            ul.appendChild(li);
         }
 
+        
         function showRoom(roomName, langVal) {
-            document.getElementById("welcome").style.display = 'none';
-            document.getElementById("room").style.display = 'block';
+            $('#welcome').hide();
+            $('#room').show();
+            $('#msg').show();
             const h3 = room.querySelector("h3");
             h3.innerText = `Room ${roomName}`;
             const msgForm = room.querySelector("#msg");
@@ -248,44 +291,25 @@
         }
 
         function handleRoomSubmit(event) {
-            event.preventDefault();
-            const langVal = form.querySelector(`input[name="langs"]:checked`).value;
-            const lang = form.querySelector(`input[name="langs"]:checked`).parentElement.innerText;
-            roomName = lang;
-            socket['lang'] = langVal;
-            
-            // 언어에 따라서 화면 언어 수정
-            change_lang(langVal);
-            change_form();
-            showRoom(roomName);
+            try {
+                event.preventDefault();
+                const langVal = form.querySelector(`input[name="langs"]:checked`).value;
+                const lang = form.querySelector(`input[name="langs"]:checked`).parentElement.innerText;
+
+                roomName = lang;
+                socket['lang'] = langVal;
+                
+                // 언어에 따라서 화면 언어 수정
+                change_lang(langVal);
+                change_form();
+                showRoom(roomName);   
+            } catch (error) {
+                alert('check the options!')
+            }
             
         }
 
         form.addEventListener("submit", handleRoomSubmit);
-
-        loginForm_login.addEventListener("submit", (event) => {
-            event.preventDefault();
-            const Id = loginForm_login.querySelector('#nick').value;
-            const password = loginForm_login.querySelector('#password').value;
-            const loginUserDto = {
-                Id, 
-                password
-            } 
-            
-            socket.emit("login", loginUserDto);
-        })
-
-        loginForm_signup.addEventListener("submit", (event) => {
-            event.preventDefault();
-            document.getElementById("loginPage").style.display = 'none';
-            document.getElementById("signupPage").style.display = 'block';
-        });
-
-        loginForm_JKG.addEventListener("submit", (event) => {
-            event.preventDefault();
-            document.getElementById("loginPage").style.display = 'none';
-            document.getElementById("welcome").style.display = 'block';
-        });
 
         signupForm.addEventListener("submit", (event) => {
             event.preventDefault();
@@ -293,7 +317,6 @@
             const password = signupForm.querySelector('#sign_password').value
             const confirm = signupForm.querySelector('#sign_confirmPassword').value
             const gender = signupForm.querySelector(`input[name="gender"]:checked`).value || null
-            const livingAt = signupForm.querySelector('#living').value || null
             const birthday = signupForm.querySelector('#birth').value || null
             let korIns = false
             if(signupForm.querySelector('input[name="KI"]:checked')){
@@ -305,7 +328,12 @@
             } 
             const phoneNumber = Number(signupForm.querySelector('#Phone').value) || null
             const name = signupForm.querySelector('#userName').value || null
-                
+            
+            // id 유효성 검사
+            if(!id_value(Id)) return false;
+            // pwd 유효성 검사
+            if(!pwd_value(password,confirm)) return false;
+
             const data = {
                 Id,
                 password,
@@ -338,9 +366,8 @@
         });
 
         socket.on("login", (res) => {
-            const { success, token } = res;
-
-            if(success){
+            if(res !== '401'){
+                const { success, token } = res;
                 window.sessionStorage.setItem("token", token);
 
                 document.getElementById("loginPage").style.display = 'none';
@@ -350,23 +377,30 @@
                 const h1 = header.querySelector("h1")
 
                 h1.innerText = `Welcome ${res.nick}!`;
-
-            } else {
-                throw new Error("Login failed: get false message")
+                alert(`Hello ${res.nick} !`);
+            }else{
+                alert('Check your ID or password!');
             }
         });
 
-        socket.on("signup", (success) => {
-            if(!success){
-                throw new Error("Signup failed")
-            } else {
+        socket.on("signup", (result) => {
+            if(result === true){
+                alert("Hello !");
                 document.getElementById("signupPage").style.display = 'none';
                 document.getElementById("loginPage").style.display = 'block';
+            }else if(result === '409'){
+                alert('You are already a registered member!');
+                $("#sign_nick").focus();
+                return false
+            }else{
+                alert('Check out the membership registration form!');
+                $("#sign_nick").focus();
+                return false
             }
         });
         
         socket.on("botMessage", async (res,trdText) => {
-            
+
             let myAddrArray = {x:latitude, y:longitude}
 
             // NaN 으로 나오는 건 소켓과 웹브라우저의 통신에서 데이터 변환이 이루어지기 때문이다 ?
@@ -381,9 +415,8 @@
             let sortAddrArray = res.filter((e)=>{ return e.status === "OK" ? 1 : 0}).sort((a,b)=> a.distance > b.distance ? 1 : a.distance < b.distance ? -1 : 0 );
 
         setTimeout(() => {
-                createMapDiv(mapId);
+                createMapDiv(mapId,sortAddrArray[0], trdText);
                 drawMap(sortAddrArray, mapId, myAddrArray);
-                response_bot(sortAddrArray[0], trdText);
                 mapId ++;
             }, 150);
         });

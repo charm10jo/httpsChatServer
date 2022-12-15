@@ -4,6 +4,11 @@ let longitude ;
 let myaddress ;
 let myregion ; 
 $(document).ready(() => {
+    $('#loginPage').show();
+    $('#signupPage').hide();
+    $('#welcome').hide();
+    $('#msg').hide();
+    $('#room').hide()
     navigator.geolocation.getCurrentPosition(
         showYourLocation,
         showErrorMsg,
@@ -52,7 +57,7 @@ function showErrorMsg(error) {
 
     // 서비스 진입 막기
     $('#loginBtn').attr('disabled','disabled').text('위치정보 수집을 허용해주세요');
-    $('#JKGBtn').attr('disabled','disabled').text('위치정보 수집을 허용해주세요');
+    $('#loginForm_JKG').attr('disabled','disabled').text('위치정보 수집을 허용해주세요');
 
     // 실패했을때 실행
     switch (error.code) {

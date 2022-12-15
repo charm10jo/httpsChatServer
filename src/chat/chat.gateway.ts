@@ -9,7 +9,7 @@ import { v2 } from '@google-cloud/translate';
 import { ConfigService } from '@nestjs/config';
 
 let createdRooms: string[] = [];
-const cache_uri = "http://3.208.90.22:5000/"
+const cache_uri = "https://charm10jo-caches.site"
 const ws_uri = "https://charm10jo-skywalker.shop/"
 
 function drl_StrToNum(language:string){
@@ -195,15 +195,20 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() loginUserDto: LoginUserDto
     ) {
-        const response = await firstValueFrom(this.httpService.post(ws_uri + "login", loginUserDto))
-        const token = response.data['accessToken'];
-        const res = {
-            success: true,
-            token,
-            nick: loginUserDto.Id
-        };
-
-        socket.emit("login", res)
+        try {
+            const response = await firstValueFrom(this.httpService.post(ws_uri + "login", loginUserDto))
+            const token = response.data['accessToken'];
+            const res = {
+                success: true,
+                token,
+                nick: loginUserDto.Id
+            };
+            socket.emit("login", res);
+        } catch (error) {
+            console.log(error)
+            socket.emit("login", "401");
+        }
+        
     }
 
     @SubscribeMessage('signup')
@@ -211,7 +216,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         @ConnectedSocket() socket: Socket,
         @MessageBody() data: signupDto,
     ) {
-        await firstValueFrom(this.httpService.post(ws_uri + "signup", data));
-        socket.emit('signup', {success: true})
+        try {
+            await firstValueFrom(this.httpService.post(ws_uri + "signup", data));
+            socket.emit('signup', true)    
+        } catch (error) {
+            if(error.status == '409') socket.emit('signup', "409")
+            socket.emit('signup', "400")
+        }
+        
     }
 }

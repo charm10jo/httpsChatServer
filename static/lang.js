@@ -1,3 +1,4 @@
+let translat_lang = '';
 let send_form = {
     Symptoms : "",
     Necessary_Medical_Measures : "",
@@ -16,12 +17,14 @@ let send_form = {
     bot_language : "",
     bot_route : "",
     bot_retry : "",
+    bot_medical_department : ""
 
 }
 
 
 
 function change_lang(lang){
+    translat_lang = lang;
     switch (lang) {
         case "en" : 
                 send_form.Symptoms = "Symptoms",
@@ -39,6 +42,7 @@ function change_lang(lang){
                 send_form.bot_route =  "Recommended Medical Facility Route";
                 send_form.bot_retry =  "If this is not the information you want";
                 send_form.send = "send";
+                send_form.bot_medical_department = "medical department";
             break;
         case "zh-TW" : 
                 send_form.Symptoms = "症状",
@@ -56,6 +60,7 @@ function change_lang(lang){
                 send_form.bot_route =  "推荐医疗设施路线";
                 send_form.bot_retry =  "如果这不是您想要的信息";
                 send_form.send = "发送";
+                send_form.bot_medical_department = "医疗部";
             break;
         case "zh-CN" : 
                 send_form.Symptoms = "症狀",
@@ -73,6 +78,7 @@ function change_lang(lang){
                 send_form.bot_route =  "推薦醫療設施路線";
                 send_form.bot_retry =  "如果這不是您想要的信息";
                 send_form.send = "發送";
+                send_form.bot_medical_department = "醫療部";
             break;
         case "vi" : 
                 send_form.Symptoms = "Triệu chứng",
@@ -90,6 +96,7 @@ function change_lang(lang){
                 send_form.bot_route =  "Lộ trình cơ sở y tế được đề xuất";
                 send_form.bot_retry =  "Nếu đây không phải là thông tin bạn muốn";
                 send_form.send = "gửi";
+                send_form.bot_medical_department = "Bộ phận y tế";
             break;
         case "mn" : 
                 send_form.Symptoms = "Шинж тэмдэг",
@@ -107,6 +114,7 @@ function change_lang(lang){
                 send_form.bot_route =  "Эмнэлгийн байгууламжийн санал болгож буй маршрут";
                 send_form.bot_retry =  "Хэрэв энэ нь таны хүссэн мэдээлэл биш бол";
                 send_form.send = "илгээх";
+                send_form.bot_medical_department = "эмнэлгийн хэлтэс";
             break;
         case "th" : 
                 send_form.Symptoms = "อาการ",
@@ -124,6 +132,7 @@ function change_lang(lang){
                 send_form.bot_route =  "เส้นทางสถานพยาบาลที่แนะนำ";
                 send_form.bot_retry =  "หากนี่ไม่ใช่ข้อมูลที่คุณต้องการ";
                 send_form.send = "ส่ง";
+                send_form.bot_medical_department = "แผนกการแพทย์";
             break;
         case "ru" : 
                 send_form.Symptoms = "Симптомы",
@@ -141,6 +150,7 @@ function change_lang(lang){
                 send_form.bot_route =  "Рекомендуемый маршрут медицинского учреждения";
                 send_form.bot_retry =  "Если это не та информация, которую вы хотите";
                 send_form.send = "Отправить";
+                send_form.bot_medical_department = "медицинский отдел";
             break;
         case "kk" : 
                 send_form.Symptoms = "Симптомдар",
@@ -158,6 +168,7 @@ function change_lang(lang){
                 send_form.bot_route =  "Медициналық мекеменің ұсынылатын бағыты";
                 send_form.bot_retry =  "Егер бұл сізге қажет ақпарат болмаса";
                 send_form.send = "жіберу";
+                send_form.bot_medical_department = "медициналық бөлім";
             break;
         case "ja" : 
                 send_form.Symptoms = "症状",
@@ -175,6 +186,7 @@ function change_lang(lang){
                 send_form.bot_route =  "おすすめの医療機関ルート";
                 send_form.bot_retry =  "これがあなたが望む情報ではない場合";
                 send_form.send = "送信";
+                send_form.bot_medical_department = "診療科"
             break;
     
         default:
