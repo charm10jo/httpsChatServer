@@ -247,12 +247,12 @@ header {
     margin-right: 0px;
     /* width:300px; */
     /* height:100px; */
-    background:var(--color-link);
+    background:aliceblue;
     border-radius: 10px;
 }
 
 .client_message:after {
-    border-top:15px solid var(--color-link);;
+    border-top:15px solid aliceblue;
     border-left: 0px solid transparent;
     border-right: 15px solid transparent;
     border-bottom: 0px solid transparent;
@@ -272,7 +272,7 @@ header {
     width:90%;
     /* height:100px; */
     /* width: fit-content; */
-    background:var(--color-link);
+    background:aliceblue;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -282,7 +282,7 @@ header {
     max-width: 559px;
 }
 .bot_message:after {
-    border-top:15px solid var(--color-link);
+    border-top:15px solid aliceblue;
     border-left: 15px solid transparent;
     border-right: 0px solid transparent;
     border-bottom: 0px solid transparent;

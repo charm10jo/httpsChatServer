@@ -425,7 +425,7 @@ function translate_division(languageCode, korDiv){
     if (division[languageCode][korDiv]){
         return division[languageCode][korDiv]
     }else{
-        return False
+        return false
     }
 }
 
