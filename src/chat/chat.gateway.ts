@@ -205,7 +205,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             };
             socket.emit("login", res);
         } catch (error) {
-            console.log(error)
             socket.emit("login", "401");
         }
         
