@@ -16,8 +16,11 @@ function id_value(Id){
 }
 
 function pwd_value(password,confirm){
-    var reg = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    
+    // var reg = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    var reg = /^(?=.*[a-zA-Z])(?=.*[0-9]).{8,25}$/;
+    const specialCharacters = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]/g;
+    const blank = /\s/g;
+
     if (password == "") {
         alert("Please check your password !");
         $("#sign_password").focus();
@@ -31,8 +34,21 @@ function pwd_value(password,confirm){
     }
 
     if(!reg.test(password) ) {
-        alert("Password must contain at least 8 letters, numbers and one special character!");
+        alert("Password must consist of 8 or more numbers and alphabets!");
+        $("#sign_confirmPassword").focus();
         return false;
+    }
+
+    if(specialCharacters.test(password)){
+        alert("Please remove special characters from your password!");
+        $("#sign_confirmPassword").focus();
+        return false
+    }
+
+    if(blank.test(password)){
+        alert("Please remove spaces in your password!");
+        $("#sign_confirmPassword").focus();
+        return false
     }
 
     if (password != confirm) {
