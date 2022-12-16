@@ -41,7 +41,7 @@
 <br>
 
 ## [📚 팀 노션](https://www.notion.so/10-Nodejs-backend-edc10b3308224cedb18a02482af91944)
-### [📚 기획](https://www.notion.so/3fa96c7e9ea14b318c4c6bb35a1e477c)
+### [📚 기획](https://alert-venom-815.notion.site/95883d2adbda4b8cb29ec161f5a3a6c3)
 #### [📚 API 명세서](https://www.notion.so/API-ef7f5c250fb24271a6ccd872cbddb717)
 ##### [📚 미네르바의 부엉이](https://www.notion.so/136b6288c5f543d8b252e33b7abb331e)
 ###### [📚 가끔 슬픔이 없이 15초 정도가 지난다](https://www.notion.so/61056fcea78e410983adbb3805e41ae1?v=ffc488a5b3824cfc81b3e457316b3623)
