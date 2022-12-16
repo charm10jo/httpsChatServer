@@ -249,6 +249,8 @@ header {
     /* height:100px; */
     background:aliceblue;
     border-radius: 10px;
+    max-width: 400px;
+    word-break: break-all;
 }
 
 .client_message:after {

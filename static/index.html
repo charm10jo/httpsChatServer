@@ -140,11 +140,10 @@
             let data_division = data.division.split(',');
             let translateDivision = [];
             let supportLanguages = [];
-            console.log(data)
-
 
             for(let e of data_division){
-                translateDivision.push(translate_division(translat_lang,e.trim()))
+                let test = translate_division(translat_lang,e.trim()); 
+                if(test) translateDivision.push(test)
             }
 
             const ul = room.querySelector("ul");
